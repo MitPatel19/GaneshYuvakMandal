@@ -1,7 +1,7 @@
 'use strict';
 const express = require('express');
 const QRCode = require('qrcode');
-const { db, getSetting } = require('../lib/db');
+const { db, getSetting, getBuiltinTemplate } = require('../lib/db');
 const h = require('../lib/helpers');
 
 const router = express.Router();
@@ -185,9 +185,7 @@ router.get('/:id/receipt', async (req, res) => {
     mode: donation.mode,
   });
 
-  const tpl = db
-    .prepare("SELECT body FROM templates WHERE name LIKE 'Donation Thank%' ORDER BY id LIMIT 1")
-    .get();
+  const tpl = getBuiltinTemplate('donation_thanks', res.locals.templateLang);
   const thanksText = h.renderTemplate(
     tpl ? tpl.body : '🙏 Thank you {{donor_name}} for {{currency}}{{amount}}. Receipt {{receipt_no}}.',
     vars

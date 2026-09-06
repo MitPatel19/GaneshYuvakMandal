@@ -776,6 +776,34 @@ table.data td.num, table.data th.num { text-align: right; white-space: nowrap; }
 .flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .flex-between { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 
+/* Developer credit — small, quiet, and out of the way */
+.credit {
+  margin: 26px 0 4px;
+  text-align: center;
+  font-size: .82rem;
+  line-height: 1.7;
+  color: var(--text-faint);
+}
+.credit b { font-weight: 700; color: var(--text-soft); }
+.credit__org {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: .78rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+/* On the dark festive headers the same mark needs light ink */
+.credit--on-dark { color: rgba(255, 248, 236, .72); }
+.credit--on-dark b { color: rgba(255, 248, 236, .95); }
+.credit--on-dark .credit__org {
+  border-color: rgba(255, 255, 255, .28);
+  background: rgba(255, 255, 255, .10);
+}
+
 /* Toast */
 .toast {
   position: fixed; left: 50%; bottom: calc(var(--bottomnav-h) + 16px);

@@ -15,7 +15,12 @@
 
 <!-- Step 1 : pick a ready message -->
 <div class="card">
-  <h3>1️⃣ <%= t('choose_template') %></h3>
+  <div class="flex-between mb-1">
+    <h3 class="mb-0">1️⃣ <%= t('choose_template') %></h3>
+    <span class="badge badge--gold">
+      🌐 <%= (languages.find(function(l){ return l.code === templateLang; }) || languages[0]).label %>
+    </span>
+  </div>
   <div class="field">
     <label class="visually-hidden" for="templatePicker"><%= t('template') %></label>
     <select id="templatePicker">

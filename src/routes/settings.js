@@ -15,7 +15,12 @@ const EDITABLE = [
   'google_maps_link', 'language', 'currency', 'country_code',
 ];
 
-const TOGGLES = ['public_page_enabled', 'public_show_donors', 'public_show_total'];
+const TOGGLES = [
+  'template_follow_ui_language',
+  'public_page_enabled',
+  'public_show_donors',
+  'public_show_total',
+];
 
 router.get('/', async (req, res) => {
   const s = allSettings();
@@ -40,7 +45,8 @@ router.get('/', async (req, res) => {
     qrDataUrl,
     publicUrl,
     publicShareLink: h.whatsappShareLink(
-      `🙏 *${s.mandal_name}* — Ganesh Mahotsav ${s.year}\n\nSee our full program, timings and location here:\n${publicUrl}\n\nGanpati Bappa Morya! 🎉`
+      `🙏 *${s.mandal_name}* — Ganesh Mahotsav ${s.year}\n\n` +
+        `${res.locals.tm('sm_see_program')}\n${publicUrl}\n\n${res.locals.tm('sm_bappa_morya')} 🎉`
     ),
   });
 });

@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const { db } = require('../lib/db');
+const { LANGUAGES } = require('../lib/i18n');
 const h = require('../lib/helpers');
 
 const router = express.Router();
@@ -73,9 +74,24 @@ const AUDIENCES = [
   { key: 'duties_today', label: "Today's duty volunteers", icon: '🪔' },
 ];
 
+/**
+ * Built-in templates are shown in the active template language; templates the
+ * mandal wrote itself always appear, whatever language they were written in,
+ * so nothing they created can silently disappear.
+ */
+function listTemplates(lang) {
+  return db
+    .prepare(
+      `SELECT * FROM templates
+        WHERE builtin_key = '' OR lang = ?
+        ORDER BY builtin_key = '' , category, name`
+    )
+    .all(lang);
+}
+
 router.get('/', (req, res) => {
   const s = res.locals.settings;
-  const templates = db.prepare('SELECT * FROM templates ORDER BY category, name').all();
+  const templates = listTemplates(res.locals.templateLang);
   const audienceKey = String(req.query.audience || 'members');
   const templateId = req.query.template ? Number(req.query.template) : null;
 
@@ -106,21 +122,29 @@ router.get('/', (req, res) => {
 /* ---------------- Template management ---------------- */
 
 router.get('/templates', (req, res) => {
-  const templates = db.prepare('SELECT * FROM templates ORDER BY category, name').all();
+  // The management page can show every language, so a mandal can fine-tune the
+  // Gujarati wording while reading the app in English.
+  const showAll = req.query.all === '1';
+  const templates = showAll
+    ? db.prepare("SELECT * FROM templates ORDER BY builtin_key = '', lang, category, name").all()
+    : listTemplates(res.locals.templateLang);
   res.render('pages/templates', {
     title: res.locals.t('templates'),
     templates,
     tokens: TOKENS,
+    showAll,
+    languages: LANGUAGES,
   });
 });
 
 router.post('/templates/new', (req, res) => {
   const name = String(req.body.name || '').trim();
   if (!name) return res.redirect('/whatsapp/templates?err=' + encodeURIComponent('Please enter a name.'));
-  db.prepare('INSERT INTO templates (name, body, category) VALUES (?, ?, ?)').run(
+  db.prepare('INSERT INTO templates (name, body, category, lang) VALUES (?, ?, ?, ?)').run(
     name,
     String(req.body.body || '').trim(),
-    String(req.body.category || 'General').trim()
+    String(req.body.category || 'General').trim(),
+    res.locals.templateLang
   );
   res.redirect('/whatsapp/templates?ok=' + encodeURIComponent('Template saved'));
 });
@@ -136,6 +160,15 @@ router.post('/templates/:id/edit', (req, res) => {
 });
 
 router.post('/templates/:id/delete', (req, res) => {
+  const tpl = db.prepare('SELECT builtin_key FROM templates WHERE id = ?').get(req.params.id);
+  if (tpl && tpl.builtin_key) {
+    return res.redirect(
+      '/whatsapp/templates?err=' +
+        encodeURIComponent(
+          'Built-in templates cannot be deleted — edit the wording instead, or just ignore it.'
+        )
+    );
+  }
   db.prepare('DELETE FROM templates WHERE id = ?').run(req.params.id);
   res.redirect('/whatsapp/templates?ok=' + encodeURIComponent('Template deleted'));
 });

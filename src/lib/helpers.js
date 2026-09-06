@@ -234,6 +234,18 @@ function baseTemplateVars(settings) {
   };
 }
 
+/**
+ * Which language the WhatsApp templates should be shown in.
+ * When "follow the language button" is on, templates track whatever language
+ * the admin is currently reading the app in. When it is off they stay on the
+ * mandal's default language, so switching the UI never changes what goes out.
+ */
+function templateLanguage(settings, uiLang) {
+  const follow = String(settings.template_follow_ui_language || '1') === '1';
+  const chosen = follow ? uiLang : settings.language;
+  return chosen || settings.language || 'en';
+}
+
 /* ------------------------------------------------------------------ */
 /*  UPI                                                                */
 /* ------------------------------------------------------------------ */
@@ -302,6 +314,7 @@ module.exports = {
   telLink,
   renderTemplate,
   baseTemplateVars,
+  templateLanguage,
   upiLink,
   toCSV,
   csvEscape,

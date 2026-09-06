@@ -67,20 +67,21 @@ router.get('/', (req, res) => {
   const s = res.locals.settings;
   const report = buildReport(s);
 
+  const tm = res.locals.tm;
   const summaryText = [
-    `📊 *${s.mandal_name}* — Hisab (Accounts) ${s.year}`,
+    `📊 *${s.mandal_name}* — ${tm('sm_accounts')} ${s.year}`,
     '',
-    `💰 Total Collected: ${h.formatMoney(report.collected, s.currency)}`,
-    `🧾 Total Spent: ${h.formatMoney(report.spent, s.currency)}`,
-    `🏦 Balance In Hand: ${h.formatMoney(report.inHand, s.currency)}`,
+    `💰 ${tm('sm_total_collected')}: ${h.formatMoney(report.collected, s.currency)}`,
+    `🧾 ${tm('sm_total_spent')}: ${h.formatMoney(report.spent, s.currency)}`,
+    `🏦 ${tm('sm_balance')}: ${h.formatMoney(report.inHand, s.currency)}`,
     '',
-    `👥 Donors: ${report.counts.donations}   |   Members: ${report.counts.members}`,
+    `👥 ${tm('sm_donors')}: ${report.counts.donations}   |   ${tm('sm_members_c')}: ${report.counts.members}`,
     '',
-    '*Top expense heads:*',
+    `*${tm('sm_top_expenses')}*`,
     ...report.byCategory.slice(0, 5).map((c) => `• ${c.label}: ${h.formatMoney(c.total, s.currency)}`),
     '',
-    `_As on ${h.formatDate(h.todayISO())}_`,
-    '🙏 Ganpati Bappa Morya!',
+    `_${tm('sm_as_on')} ${h.formatDate(h.todayISO())}_`,
+    `🙏 ${tm('sm_bappa_morya')}`,
   ].join('\n');
 
   res.render('pages/reports', {

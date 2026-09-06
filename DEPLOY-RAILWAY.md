@@ -120,6 +120,12 @@ Your two important links:
 4. Go to **👥 Members** and add your committee.
 5. Go to **💬 WhatsApp**, choose the *Invitation* template and start sending.
 
+> 💬 **Message language.** Templates are supplied in English, Gujarati, Hindi
+> and Marathi, and follow whichever language you pick with the 🌐 button. If you
+> would rather always send in one language no matter what language you read the
+> app in, turn off *Settings → Message language → Match message language to the
+> 🌐 language button*; messages then always use your Default Language.
+
 ---
 
 ## Step 6 — Add it to everyone's phone
@@ -198,6 +204,12 @@ db.prepare('UPDATE users SET password_hash = ? WHERE username = ?')
 console.log('Password reset for admin');
 "
 ```
+
+**My templates are in the wrong language**
+Check *Settings → Message language*. When the match toggle is on, templates
+follow the 🌐 button in the header. When it is off, they follow *Default
+Language* in the same Settings page. You can also edit the wording of any
+language yourself: **WhatsApp → Templates → Show all languages**.
 
 **WhatsApp opens but the message is empty**
 Some older WhatsApp versions struggle with very long messages. Shorten the

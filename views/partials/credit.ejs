@@ -1,0 +1,10 @@
+<%
+  // Optional locals: onDark (light ink for festive headers), noPrint (hide on paper)
+  var creditOnDark = (typeof onDark !== 'undefined') && onDark;
+  var creditNoPrint = (typeof noPrint !== 'undefined') && noPrint;
+%>
+<p class="credit <%= creditOnDark ? 'credit--on-dark' : '' %> <%= creditNoPrint ? 'no-print' : '' %>">
+  <%= t('developed_by') %>
+  <b>Mit Rameshbhai Patel</b>
+  <span class="credit__org">AGI Software Solutions</span>
+</p>

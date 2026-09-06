@@ -95,6 +95,11 @@ app.use((req, res, next) => {
   res.locals.user = req.user;
   res.locals.currency = settings.currency || '₹';
   res.locals.today = helpers.todayISO();
+  res.locals.templateLang = helpers.templateLanguage(settings, lang);
+  // `t` translates the screen; `tm` translates the messages that go out on
+  // WhatsApp — they differ whenever the template language is pinned.
+  res.locals.tm = translator(res.locals.templateLang);
+  res.locals.templateLangFollows = String(settings.template_follow_ui_language || '1') === '1';
   res.locals.currentPath = req.path;
   res.locals.query = req.query;
   res.locals.flash = req.query.ok ? String(req.query.ok) : '';

@@ -24,9 +24,16 @@ Meta. It uses standard `wa.me` links, so it works from any phone or laptop:
   message is already typed, you just press send. Names turn green ✅ as you go
   so you never lose your place in a long list.
 - **`{{name}}` personalisation** — each person gets a message addressed to them.
-- **Message templates** — invitation, donation request, thank-you receipt,
-  aarti reminder, duty reminder, visarjan announcement. Your mandal name,
+- **Message templates in four languages** — invitation, donation request,
+  thank-you receipt, aarti reminder, duty reminder and visarjan announcement,
+  each written out in English, Gujarati, Hindi and Marathi. Your mandal name,
   dates, address and UPI ID are filled in automatically. Add your own too.
+- **Templates follow the language you pick.** Switch the 🌐 button to हिंदी and
+  every outgoing message — templates, receipts, duty reminders, the shared
+  program and the accounts summary — switches with it. Prefer to always send in
+  one language regardless of what you read the app in? Turn off *Settings →
+  Message language → Match message language to the 🌐 language button* and
+  messages stay on your mandal's default language.
 - **Share anything, anywhere** — the full program, one day's program, a
   donation receipt, an announcement, the duty roster, the accounts summary,
   an aarti's lyrics, or the link to your public page.
@@ -80,7 +87,7 @@ records while keeping members, photos, templates and settings.
 |---|---|
 | **Large default text** | 17px base with an **A− / A+** control saved per device |
 | **Big tap targets** | Every button is at least 50px tall |
-| **Four languages** | English · ગુજરાતી · हिंदी · मराठी, switchable from the header |
+| **Four languages** | English · ગુજરાતી · हिंदी · मराठी, switchable from the header — screens *and* WhatsApp messages |
 | **Works one-handed** | Bottom navigation on phones, sidebar on desktop |
 | **Installable** | Add to Home Screen on Android and iPhone; opens like an app |
 | **Prints properly** | Receipts and the accounts sheet have real print stylesheets |
@@ -154,6 +161,7 @@ src/
     auth.js            Login, password hashing, rate limiting
     helpers.js         Dates, money, phone/WhatsApp links, templates, CSV
     i18n.js            English / Gujarati / Hindi / Marathi dictionary
+    templates.js       Built-in WhatsApp templates in all four languages
   routes/              One file per section of the app
 views/
   partials/            Shared header and footer
@@ -174,6 +182,12 @@ The app ships with **14 September 2026** (Ganesh Chaturthi) and
 **24 September 2026** (Anant Chaturdashi / Visarjan) as defaults. Please
 confirm both against your own panchang and set them under **Settings** — the
 countdown, the program days and the duty calendar are all derived from them.
+
+---
+
+## Credits
+
+Developed by **Mit Rameshbhai Patel** — AGI Software Solutions.
 
 ---
 

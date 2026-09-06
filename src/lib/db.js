@@ -4,6 +4,8 @@ const path = require('path');
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const config = require('./config');
+const { BUILTIN_TEMPLATES, LEGACY_NAME_TO_KEY } = require('./templates');
+const { LANGUAGES } = require('./i18n');
 
 const db = new Database(config.dbFile);
 db.pragma('journal_mode = WAL');
@@ -36,6 +38,9 @@ const DEFAULT_SETTINGS = {
   language: 'en',
   currency: '₹',
   country_code: '91',
+  // When on, WhatsApp templates are shown in whichever language is picked with
+  // the 🌐 button. When off, they always use the default language above.
+  template_follow_ui_language: '1',
   public_page_enabled: '1',
   public_show_donors: '1',
   public_show_total: '0',
@@ -67,45 +72,6 @@ function allSettings() {
 /* ------------------------------------------------------------------ */
 /*  First-run seeding                                                  */
 /* ------------------------------------------------------------------ */
-
-const DEFAULT_TEMPLATES = [
-  {
-    name: 'Invitation / Aamantran',
-    category: 'Invite',
-    body:
-      '🙏 *Ganpati Bappa Morya!* 🙏\n\n{{mandal_name}} warmly invites you and your family to our Ganesh Mahotsav {{year}}.\n\n📅 {{festival_start}} to {{festival_end}}\n📍 {{address}}\n\nPlease come for darshan and aarti with your family.\n\n_Ganpati Bappa Morya, Mangal Murti Morya!_',
-  },
-  {
-    name: 'Donation Thank You',
-    category: 'Donation',
-    body:
-      '🙏 *Thank you {{donor_name}}!* 🙏\n\nWe have received your contribution of {{currency}}{{amount}} for {{mandal_name}} Ganesh Mahotsav {{year}}.\nReceipt No: {{receipt_no}}\nDate: {{date}}\n\nMay Bappa bless you and your family with health, happiness and prosperity.\n\n_Ganpati Bappa Morya!_',
-  },
-  {
-    name: 'Donation Request / Vargani',
-    category: 'Donation',
-    body:
-      '🙏 *Ganpati Bappa Morya!* 🙏\n\n{{mandal_name}} is celebrating Ganesh Mahotsav {{year}} from {{festival_start}} to {{festival_end}}.\n\nWe humbly request your contribution (vargani) to help us serve the community.\n\n💳 UPI: {{upi_id}}\n📞 Contact: {{president_phone}}\n\nEvery contribution, big or small, is a blessing. Thank you!',
-  },
-  {
-    name: "Today's Aarti Reminder",
-    category: 'Reminder',
-    body:
-      '🔔 *Aarti Reminder* 🔔\n\n{{mandal_name}}\n\nAarti today at the mandap. Please join us on time with your family.\n\n📍 {{address}}\n\n_Ganpati Bappa Morya!_',
-  },
-  {
-    name: 'Duty Reminder for Volunteer',
-    category: 'Reminder',
-    body:
-      '🙏 Jai Shree Ganesh {{member_name}},\n\nYou have *{{slot}}* duty on {{date}} at {{mandal_name}}.\n\nPlease reach the mandap 15 minutes early.\nThank you for your seva! 🙏',
-  },
-  {
-    name: 'Visarjan Announcement',
-    category: 'Invite',
-    body:
-      '🙏 *Ganpati Visarjan* 🙏\n\n{{mandal_name}} Ganesh Visarjan Yatra on {{festival_end}}.\n\nPlease join the procession with your family and give Bappa a grand farewell.\n\n_Ganpati Bappa Morya, Pudhchya Varshi Lavkar Ya!_ 🎉',
-  },
-];
 
 const DEFAULT_AARTIS = [
   {
@@ -196,6 +162,57 @@ const DEFAULT_AARTIS = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Schema migrations for databases created by an earlier version      */
+/* ------------------------------------------------------------------ */
+
+function columnExists(table, column) {
+  return db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === column);
+}
+
+function migrate() {
+  // v1 -> v2: templates gained a language and a stable key for the built-ins.
+  if (!columnExists('templates', 'lang')) {
+    db.exec("ALTER TABLE templates ADD COLUMN lang TEXT NOT NULL DEFAULT 'en'");
+  }
+  if (!columnExists('templates', 'builtin_key')) {
+    db.exec("ALTER TABLE templates ADD COLUMN builtin_key TEXT NOT NULL DEFAULT ''");
+    // The six English templates the first release seeded are matched by their
+    // original name so they become the English copy of each built-in, and any
+    // wording the mandal already edited is preserved.
+    const claim = db.prepare(
+      "UPDATE templates SET builtin_key = ?, lang = 'en' WHERE name = ? AND builtin_key = ''"
+    );
+    db.transaction(() => {
+      for (const [name, key] of Object.entries(LEGACY_NAME_TO_KEY)) claim.run(key, name);
+    })();
+  }
+  db.exec(
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_templates_builtin " +
+      "ON templates(builtin_key, lang) WHERE builtin_key <> ''"
+  );
+}
+
+/**
+ * Make sure every built-in template exists in every language. Rows that are
+ * already there are left completely alone, so edits are never overwritten.
+ */
+function syncBuiltinTemplates() {
+  const has = db.prepare('SELECT id FROM templates WHERE builtin_key = ? AND lang = ?');
+  const ins = db.prepare(
+    'INSERT INTO templates (name, body, category, lang, builtin_key) VALUES (?, ?, ?, ?, ?)'
+  );
+  db.transaction(() => {
+    for (const tpl of BUILTIN_TEMPLATES) {
+      for (const { code } of LANGUAGES) {
+        const copy = tpl[code];
+        if (!copy || has.get(tpl.key, code)) continue;
+        ins.run(copy.name, copy.body, tpl.category[code] || tpl.category.en, code, tpl.key);
+      }
+    }
+  })();
+}
+
 function seedFirstRun() {
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     if (!getSettingStmt.get(key)) setSetting(key, value);
@@ -213,12 +230,7 @@ function seedFirstRun() {
     );
   }
 
-  const tplCount = db.prepare('SELECT COUNT(*) AS c FROM templates').get().c;
-  if (tplCount === 0) {
-    const ins = db.prepare('INSERT INTO templates (name, body, category) VALUES (?, ?, ?)');
-    const tx = db.transaction((rows) => rows.forEach((t) => ins.run(t.name, t.body, t.category)));
-    tx(DEFAULT_TEMPLATES);
-  }
+  syncBuiltinTemplates();
 
   const aartiCount = db.prepare('SELECT COUNT(*) AS c FROM aartis').get().c;
   if (aartiCount === 0) {
@@ -230,6 +242,31 @@ function seedFirstRun() {
   }
 }
 
+migrate();
 seedFirstRun();
 
-module.exports = { db, getSetting, setSetting, allSettings, DEFAULT_SETTINGS, seedFirstRun };
+/**
+ * Fetch a built-in template by its stable key in the requested language.
+ * Falls back to English, then to any language that exists, so a message is
+ * never blank just because one translation was deleted.
+ */
+function getBuiltinTemplate(key, lang) {
+  const byLang = db.prepare('SELECT * FROM templates WHERE builtin_key = ? AND lang = ?');
+  return (
+    byLang.get(key, lang) ||
+    byLang.get(key, 'en') ||
+    db.prepare('SELECT * FROM templates WHERE builtin_key = ? ORDER BY id LIMIT 1').get(key) ||
+    null
+  );
+}
+
+module.exports = {
+  db,
+  getBuiltinTemplate,
+  getSetting,
+  setSetting,
+  allSettings,
+  DEFAULT_SETTINGS,
+  seedFirstRun,
+  syncBuiltinTemplates,
+};

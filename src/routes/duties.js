@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express');
-const { db } = require('../lib/db');
+const { db, getBuiltinTemplate } = require('../lib/db');
 const h = require('../lib/helpers');
 
 const router = express.Router();
@@ -11,10 +11,8 @@ const SLOTS = [
   'Donation Collection', 'Sound System', 'Other',
 ];
 
-function dutyMessage(duty, settings) {
-  const tpl = db
-    .prepare("SELECT body FROM templates WHERE name LIKE 'Duty Reminder%' ORDER BY id LIMIT 1")
-    .get();
+function dutyMessage(duty, settings, lang) {
+  const tpl = getBuiltinTemplate('duty_reminder', lang);
   const vars = Object.assign(h.baseTemplateVars(settings), {
     member_name: duty.member_name || '',
     name: duty.member_name || '',
@@ -41,19 +39,20 @@ router.get('/', (req, res) => {
   const allCount = db.prepare('SELECT COUNT(*) AS c FROM duties').get().c;
 
   const withLinks = duties.map((d) => {
-    const msg = dutyMessage(d, s);
+    const msg = dutyMessage(d, s, res.locals.templateLang);
     return { ...d, message: msg, waLink: h.whatsappLink(d.phone, msg, s.country_code) };
   });
 
   // One message listing the whole day's roster, for the mandal WhatsApp group.
+  const tm = res.locals.tm;
   const groupLines = [
-    `🪔 *${s.mandal_name}* — Duty for ${h.formatDate(date)}`,
+    `🪔 *${s.mandal_name}* — ${tm('sm_duty_for')} ${h.formatDate(date)}`,
     '',
     ...(duties.length
       ? duties.map((d) => `• *${d.slot}*: ${d.member_name || '—'}${d.note ? ' (' + d.note + ')' : ''}`)
-      : ['_No duty assigned yet._']),
+      : [`_${tm('sm_no_duty')}_`]),
     '',
-    'Please be on time. Thank you for your seva! 🙏',
+    `${tm('sm_be_on_time')} 🙏`,
   ];
   const groupText = groupLines.join('\n');
 

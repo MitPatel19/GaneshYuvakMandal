@@ -25,8 +25,12 @@ function groupByDay(events, settings) {
 }
 
 /** Plain-text schedule that reads well inside a WhatsApp bubble. */
-function scheduleText(days, settings, onlyDate) {
-  const lines = [`🙏 *${settings.mandal_name}* 🙏`, `📅 Ganesh Mahotsav ${settings.year} — Program`, ''];
+function scheduleText(days, settings, onlyDate, tm) {
+  const lines = [
+    `🙏 *${settings.mandal_name}* 🙏`,
+    `📅 Ganesh Mahotsav ${settings.year} — ${tm('sm_program')}`,
+    '',
+  ];
   let any = false;
   for (const day of days) {
     if (onlyDate && day.date !== onlyDate) continue;
@@ -40,10 +44,10 @@ function scheduleText(days, settings, onlyDate) {
     }
     lines.push('');
   }
-  if (!any) lines.push('_Program will be announced soon._', '');
+  if (!any) lines.push(`_${tm('sm_program_soon')}_`, '');
   if (settings.address) lines.push(`📍 ${settings.address}`);
   if (settings.google_maps_link) lines.push(`🗺 ${settings.google_maps_link}`);
-  lines.push('', 'Ganpati Bappa Morya! 🎉');
+  lines.push('', `${tm('sm_bappa_morya')} 🎉`);
   return lines.join('\n');
 }
 
@@ -51,9 +55,10 @@ router.get('/', (req, res) => {
   const s = res.locals.settings;
   const events = db.prepare('SELECT * FROM events ORDER BY event_date, start_time, id').all();
   const days = groupByDay(events, s);
-  const shareAll = scheduleText(days, s);
+  const tm = res.locals.tm;
+  const shareAll = scheduleText(days, s, null, tm);
   const today = h.todayISO();
-  const shareToday = scheduleText(days, s, today);
+  const shareToday = scheduleText(days, s, today, tm);
 
   res.render('pages/schedule', {
     title: res.locals.t('schedule'),

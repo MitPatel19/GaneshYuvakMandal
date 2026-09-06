@@ -1,8 +1,22 @@
 <%- include('../partials/header') %>
 
 <div class="pagehead">
-  <h1>📝 <%= t('templates') %></h1>
-  <div class="pagehead__actions"><a class="btn btn--ghost" href="/whatsapp">← <%= t('whatsapp') %></a></div>
+  <div>
+    <h1>📝 <%= t('templates') %></h1>
+    <div class="pagehead__sub">
+      <%= t('templates_in') %>:
+      <b><%= (languages.find(function(l){ return l.code === templateLang; }) || languages[0]).label %></b>
+      <% if (!templateLangFollows) { %>
+        · <span class="badge">🔒 fixed in <a href="/settings"><%= t('settings') %></a></span>
+      <% } %>
+    </div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/whatsapp/templates<%= showAll ? '' : '?all=1' %>">
+      <%= showAll ? '🌐 ' + t('templates_in') : '🌐 ' + t('show_all_languages') %>
+    </a>
+    <a class="btn btn--ghost" href="/whatsapp">← <%= t('whatsapp') %></a>
+  </div>
 </div>
 
 <div class="card">
@@ -32,6 +46,14 @@
 
 <% templates.forEach(function(tp){ %>
   <div class="card">
+    <div class="flex mb-1">
+      <span class="badge <%= tp.builtin_key ? 'badge--gold' : 'badge--info' %>">
+        <%= tp.builtin_key ? t('builtin') : t('custom') %>
+      </span>
+      <span class="badge">
+        <%= (languages.find(function(l){ return l.code === tp.lang; }) || { label: tp.lang }).label %>
+      </span>
+    </div>
     <form method="post" action="/whatsapp/templates/<%= tp.id %>/edit">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="formgrid">
@@ -53,11 +75,13 @@
         <a class="btn btn--ghost btn--sm" href="/whatsapp?template=<%= tp.id %>">💬 Use this</a>
       </div>
     </form>
-    <form method="post" action="/whatsapp/templates/<%= tp.id %>/delete"
-          data-confirm="<%= t('confirm_delete') %>" data-no-lock class="mt-1">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <button class="btn btn--ghost btn--sm" type="submit">🗑 <%= t('delete') %></button>
-    </form>
+    <% if (!tp.builtin_key) { %>
+      <form method="post" action="/whatsapp/templates/<%= tp.id %>/delete"
+            data-confirm="<%= t('confirm_delete') %>" data-no-lock class="mt-1">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn--ghost btn--sm" type="submit">🗑 <%= t('delete') %></button>
+      </form>
+    <% } %>
   </div>
 <% }); %>
 

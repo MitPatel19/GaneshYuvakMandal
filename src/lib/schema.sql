@@ -95,12 +95,19 @@ CREATE TABLE IF NOT EXISTS announcements (
 );
 
 CREATE TABLE IF NOT EXISTS templates (
-  id         INTEGER PRIMARY KEY AUTOINCREMENT,
-  name       TEXT NOT NULL,
-  body       TEXT NOT NULL DEFAULT '',
-  category   TEXT NOT NULL DEFAULT 'General',
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  name        TEXT NOT NULL,
+  body        TEXT NOT NULL DEFAULT '',
+  category    TEXT NOT NULL DEFAULT 'General',
+  -- Language this wording is written in (en / gu / hi / mr).
+  lang        TEXT NOT NULL DEFAULT 'en',
+  -- Set for the templates that ship with the app, empty for ones the mandal
+  -- writes itself. Lets the app find "the thank-you message" in any language.
+  builtin_key TEXT NOT NULL DEFAULT '',
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
+-- The unique index on (builtin_key, lang) is created in db.js migrate(), after
+-- the columns are guaranteed to exist on databases made by an earlier version.
 
 CREATE TABLE IF NOT EXISTS photos (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,

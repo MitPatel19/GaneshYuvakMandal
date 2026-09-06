@@ -67,11 +67,12 @@ router.get('/p', async (req, res) => {
   }
 
   const pageUrl = `${req.protocol}://${req.get('host')}/p`;
+  const tm = res.locals.tm;
   const shareText =
     `🙏 *${s.mandal_name}* — Ganesh Mahotsav ${s.year}\n\n` +
-    `📅 ${h.formatDate(s.festival_start)} to ${h.formatDate(s.festival_end)}\n` +
+    `📅 ${h.formatDate(s.festival_start)} — ${h.formatDate(s.festival_end)}\n` +
     (s.address ? `📍 ${s.address}\n` : '') +
-    `\nFull program and details:\n${pageUrl}\n\nGanpati Bappa Morya! 🎉`;
+    `\n${tm('sm_full_details')}\n${pageUrl}\n\n${tm('sm_bappa_morya')} 🎉`;
 
   res.render('pages/public', {
     title: `${s.mandal_name} — Ganesh Mahotsav ${s.year}`,

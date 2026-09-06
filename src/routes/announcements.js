@@ -8,8 +8,9 @@ const router = express.Router();
 router.get('/', (req, res) => {
   const s = res.locals.settings;
   const rows = db.prepare('SELECT * FROM announcements ORDER BY pinned DESC, id DESC').all();
+  const tm = res.locals.tm;
   const announcements = rows.map((a) => {
-    const text = `📢 *${a.title}*\n\n${a.body}\n\n— ${s.mandal_name}\n🙏 Ganpati Bappa Morya!`;
+    const text = `📢 *${a.title}*\n\n${a.body}\n\n— ${s.mandal_name}\n🙏 ${tm('sm_bappa_morya')}`;
     return { ...a, shareText: text, shareLink: h.whatsappShareLink(text) };
   });
   res.render('pages/announcements', {

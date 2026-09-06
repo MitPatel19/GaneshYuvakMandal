@@ -164,6 +164,24 @@
         <input type="text" id="currency" name="currency" value="<%= s.currency %>" maxlength="3">
       </div>
     </div>
+    <hr class="divider">
+
+    <div class="label">💬 <%= t('msg_language') %></div>
+    <label class="check <%= s.template_follow_ui_language === '1' ? 'check--on' : '' %>">
+      <input type="checkbox" name="template_follow_ui_language" value="1"
+             <%= s.template_follow_ui_language === '1' ? 'checked' : '' %>>
+      <span><%= t('follow_ui_language') %></span>
+    </label>
+    <div class="field__hint mb-2"><%= t('follow_ui_language_hint') %></div>
+    <div class="alert alert--ok" style="margin-bottom:16px">
+      <span class="alert__ic">💬</span>
+      <span>
+        <%= t('templates_in') %>:
+        <b><%= (languages.find(function(l){ return l.code === templateLang; }) || languages[0]).label %></b>
+        <a class="small" href="/whatsapp/templates" style="margin-left:8px"><%= t('templates') %> →</a>
+      </span>
+    </div>
+
     <div class="field">
       <label for="country_code">Phone country code (for WhatsApp)</label>
       <input type="text" id="country_code" name="country_code" value="<%= s.country_code %>" inputmode="numeric" maxlength="4">

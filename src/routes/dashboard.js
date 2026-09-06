@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express');
-const { db } = require('../lib/db');
+const { db, getBuiltinTemplate } = require('../lib/db');
 const h = require('../lib/helpers');
 
 const router = express.Router();
@@ -40,9 +40,7 @@ router.get('/', (req, res) => {
 
   // Ready-made invitation the user can fire off in one tap.
   const vars = h.baseTemplateVars(s);
-  const inviteTemplate = db
-    .prepare("SELECT body FROM templates WHERE name LIKE 'Invitation%' ORDER BY id LIMIT 1")
-    .get();
+  const inviteTemplate = getBuiltinTemplate('invitation', res.locals.templateLang);
   const inviteText = h.renderTemplate(
     inviteTemplate
       ? inviteTemplate.body
