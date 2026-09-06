@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <h1>🧾 <%= title %></h1>
+  <div class="pagehead__actions"><a class="btn btn--ghost" href="/expenses">← <%= t('back') %></a></div>
+</div>
+
+<form method="post" action="<%= action %>" class="container-narrow">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="card">
+    <div class="field">
+      <label for="etitle">What was the money spent on? *</label>
+      <input type="text" id="etitle" name="title" value="<%= expense.title %>" required autofocus
+             placeholder="e.g. Flowers for decoration">
+    </div>
+
+    <div class="formgrid">
+      <div class="field">
+        <label for="eamount"><%= t('amount') %> (<%= currency %>) *</label>
+        <input type="number" id="eamount" name="amount" value="<%= expense.amount %>" min="1" step="1" inputmode="numeric" required>
+      </div>
+      <div class="field">
+        <label for="spent_on"><%= t('date') %></label>
+        <input type="date" id="spent_on" name="spent_on" value="<%= expense.spent_on %>">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="ecategory"><%= t('category') %></label>
+      <select id="ecategory" name="category">
+        <% categories.forEach(function(c){ %>
+          <option value="<%= c %>" <%= expense.category === c ? 'selected' : '' %>><%= c %></option>
+        <% }); %>
+      </select>
+    </div>
+
+    <div class="formgrid">
+      <div class="field">
+        <label for="vendor"><%= t('vendor') %></label>
+        <input type="text" id="vendor" name="vendor" value="<%= expense.vendor %>">
+      </div>
+      <div class="field">
+        <label for="paid_by"><%= t('paid_by') %></label>
+        <input type="text" id="paid_by" name="paid_by" value="<%= expense.paid_by %>">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="enote"><%= t('note') %></label>
+      <textarea id="enote" name="note" style="min-height:80px"><%= expense.note %></textarea>
+    </div>
+
+    <div class="btnrow mt-2">
+      <button class="btn btn--primary btn--lg" type="submit">💾 <%= t('save') %></button>
+      <a class="btn btn--ghost" href="/expenses"><%= t('cancel') %></a>
+    </div>
+  </div>
+</form>
+
+<% if (expense.id) { %>
+  <form class="container-narrow" method="post" action="/expenses/<%= expense.id %>/delete"
+        data-confirm="<%= t('confirm_delete') %>" data-no-lock>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="btn btn--danger btn--sm" type="submit">🗑 <%= t('delete') %></button>
+  </form>
+<% } %>
+
+<%- include('../partials/footer') %>

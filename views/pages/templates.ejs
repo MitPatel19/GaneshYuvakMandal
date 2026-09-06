@@ -1,0 +1,64 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <h1>📝 <%= t('templates') %></h1>
+  <div class="pagehead__actions"><a class="btn btn--ghost" href="/whatsapp">← <%= t('whatsapp') %></a></div>
+</div>
+
+<div class="card">
+  <h3><%= t('add_new') %></h3>
+  <form method="post" action="/whatsapp/templates/new">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="formgrid">
+      <div class="field">
+        <label for="tname"><%= t('name') %> *</label>
+        <input type="text" id="tname" name="name" required placeholder="e.g. Mahaprasad invite">
+      </div>
+      <div class="field">
+        <label for="tcat"><%= t('category') %></label>
+        <input type="text" id="tcat" name="category" value="General">
+      </div>
+    </div>
+    <div class="field">
+      <label for="tbody"><%= t('message') %></label>
+      <textarea id="tbody" name="body" placeholder="🙏 {{mandal_name}} invites you…"></textarea>
+      <div class="field__hint">
+        Available: <% tokens.forEach(function(tok){ %><code><%= tok %></code> <% }); %>
+      </div>
+    </div>
+    <button class="btn btn--primary btn--lg" type="submit">💾 <%= t('save') %></button>
+  </form>
+</div>
+
+<% templates.forEach(function(tp){ %>
+  <div class="card">
+    <form method="post" action="/whatsapp/templates/<%= tp.id %>/edit">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="formgrid">
+        <div class="field">
+          <label for="n<%= tp.id %>"><%= t('name') %></label>
+          <input type="text" id="n<%= tp.id %>" name="name" value="<%= tp.name %>">
+        </div>
+        <div class="field">
+          <label for="c<%= tp.id %>"><%= t('category') %></label>
+          <input type="text" id="c<%= tp.id %>" name="category" value="<%= tp.category %>">
+        </div>
+      </div>
+      <div class="field">
+        <label for="b<%= tp.id %>"><%= t('message') %></label>
+        <textarea id="b<%= tp.id %>" name="body"><%= tp.body %></textarea>
+      </div>
+      <div class="btnrow">
+        <button class="btn btn--primary btn--sm" type="submit">💾 <%= t('save') %></button>
+        <a class="btn btn--ghost btn--sm" href="/whatsapp?template=<%= tp.id %>">💬 Use this</a>
+      </div>
+    </form>
+    <form method="post" action="/whatsapp/templates/<%= tp.id %>/delete"
+          data-confirm="<%= t('confirm_delete') %>" data-no-lock class="mt-1">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn--ghost btn--sm" type="submit">🗑 <%= t('delete') %></button>
+    </form>
+  </div>
+<% }); %>
+
+<%- include('../partials/footer') %>

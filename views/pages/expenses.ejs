@@ -1,0 +1,73 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>🧾 <%= t('expenses') %></h1>
+    <div class="pagehead__sub"><%= count %> entries · <b class="money-out"><%= h.formatMoney(total, currency) %></b></div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/expenses/export.csv?<%= new URLSearchParams(filters).toString() %>">⬇ CSV</a>
+    <a class="btn btn--primary" href="/expenses/new">➕ <%= t('new_expense') %></a>
+  </div>
+</div>
+
+<form class="searchbar" method="get" action="/expenses" data-no-lock>
+  <input type="search" name="q" value="<%= filters.q %>" placeholder="<%= t('search') %> — <%= t('title') %>, <%= t('vendor') %>">
+  <select name="category" aria-label="<%= t('category') %>">
+    <option value="">— <%= t('category') %> —</option>
+    <% categories.forEach(function(c){ %>
+      <option value="<%= c %>" <%= filters.category === c ? 'selected' : '' %>><%= c %></option>
+    <% }); %>
+  </select>
+  <button class="btn btn--ghost" type="submit">🔍</button>
+  <% if (filters.q || filters.category) { %><a class="btn btn--ghost" href="/expenses"><%= t('clear') %></a><% } %>
+</form>
+
+<% if (byCategory.length) { %>
+  <div class="card">
+    <h3 class="mb-1">By category</h3>
+    <div class="flex">
+      <% byCategory.forEach(function(c){ %>
+        <a class="chip" href="/expenses?category=<%= encodeURIComponent(c.label) %>">
+          <%= c.label %> · <b><%= h.formatMoney(c.total, currency) %></b>
+        </a>
+      <% }); %>
+    </div>
+  </div>
+<% } %>
+
+<div class="card card--flush">
+  <% if (expenses.length) { %>
+    <ul class="list">
+      <% expenses.forEach(function(e){ %>
+        <li class="list__item">
+          <div class="list__main">
+            <div class="list__title"><%= e.title %></div>
+            <div class="list__meta">
+              <%= h.formatDate(e.spent_on) %>
+              · <span class="badge badge--out"><%= e.category %></span>
+              <% if (e.vendor) { %> · 🏪 <%= e.vendor %><% } %>
+              <% if (e.paid_by) { %> · 👤 <%= e.paid_by %><% } %>
+            </div>
+          </div>
+          <div class="list__side"><div class="money-out big"><%= h.formatMoney(e.amount, currency) %></div></div>
+          <div class="list__actions">
+            <a class="btn btn--ghost btn--sm" href="/expenses/<%= e.id %>/edit"><%= t('edit') %></a>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+    <div class="card__foot flex-between">
+      <span class="bold"><%= t('total') %></span>
+      <span class="money-out big"><%= h.formatMoney(total, currency) %></span>
+    </div>
+  <% } else { %>
+    <div class="empty">
+      <div class="empty__ic">🧾</div>
+      <p><%= t('none_yet') %></p>
+      <a class="btn btn--primary" href="/expenses/new">➕ <%= t('new_expense') %></a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

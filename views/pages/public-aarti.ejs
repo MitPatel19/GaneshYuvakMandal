@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8e1b3a">
+<title><%= aarti.title %> · <%= settings.mandal_name %></title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<main class="page" style="padding-top:22px">
+<div class="container-narrow">
+
+  <div class="pagehead">
+    <div>
+      <h1><%= aarti.title %></h1>
+      <div class="pagehead__sub"><%= settings.mandal_name %> · <%= aarti.language %></div>
+    </div>
+    <div class="pagehead__actions">
+      <button class="btn btn--ghost" type="button" data-lyric="down" aria-label="Smaller text">A−</button>
+      <button class="btn btn--ghost" type="button" data-lyric="up" aria-label="Bigger text">A+</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lyrics"><%= aarti.lyrics %></div>
+  </div>
+
+  <div class="btnrow" style="justify-content:center">
+    <a class="btn btn--whatsapp" href="<%= shareLink %>" target="_blank" rel="noopener">💬 <%= t('share') %></a>
+    <a class="btn btn--ghost" href="/p">← <%= t('back') %></a>
+  </div>
+
+  <p class="center muted mt-3">🙏 Ganpati Bappa Morya 🙏</p>
+</div>
+</main>
+<script src="/js/app.js" defer></script>
+</body>
+</html>

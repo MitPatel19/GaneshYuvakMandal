@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= settings.mandal_name %> — Hisab <%= settings.year %></title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="page"><div class="container">
+
+  <div class="center mb-3">
+    <div style="font-size:2.4rem">🕉</div>
+    <h1 style="margin-bottom:2px"><%= settings.mandal_name %></h1>
+    <div class="muted"><%= settings.address %></div>
+    <h2 style="margin-top:8px">Ganesh Mahotsav <%= settings.year %> — Hisab / Accounts</h2>
+    <div class="muted small">As on <%= h.formatDate(today) %></div>
+    <div class="btnrow no-print" style="justify-content:center;margin-top:12px">
+      <button class="btn btn--primary" type="button" data-print>🖨 <%= t('print') %></button>
+      <a class="btn btn--ghost" href="/reports">← <%= t('back') %></a>
+    </div>
+  </div>
+
+  <div class="grid grid--3 mb-3">
+    <div class="stat stat--in"><div class="stat__label"><%= t('collected') %></div>
+      <div class="stat__value"><%= h.formatMoney(r.collected, currency) %></div></div>
+    <div class="stat stat--out"><div class="stat__label"><%= t('spent') %></div>
+      <div class="stat__value"><%= h.formatMoney(r.spent, currency) %></div></div>
+    <div class="stat stat--hand"><div class="stat__label"><%= t('in_hand') %></div>
+      <div class="stat__value"><%= h.formatMoney(r.inHand, currency) %></div></div>
+  </div>
+
+  <h2>💰 <%= t('donations') %> (<%= donations.length %>)</h2>
+  <div class="tablewrap mb-3">
+    <table class="data">
+      <thead><tr>
+        <th>#</th><th><%= t('receipt_no') %></th><th><%= t('date') %></th>
+        <th><%= t('donor_name') %></th><th><%= t('payment_mode') %></th><th class="num"><%= t('amount') %></th>
+      </tr></thead>
+      <tbody>
+        <% donations.forEach(function(d, i){ %>
+          <tr>
+            <td><%= i + 1 %></td><td><%= d.receipt_no %></td><td><%= h.formatDate(d.donated_on) %></td>
+            <td><%= d.donor_name %></td><td><%= d.mode %></td>
+            <td class="num"><%= h.formatMoney(d.amount, currency) %></td>
+          </tr>
+        <% }); %>
+        <% if (!donations.length) { %><tr><td colspan="6" class="muted">No entries</td></tr><% } %>
+      </tbody>
+      <tfoot><tr>
+        <th colspan="5"><%= t('total') %></th>
+        <th class="num"><%= h.formatMoney(r.collected, currency) %></th>
+      </tr></tfoot>
+    </table>
+  </div>
+
+  <h2>🧾 <%= t('expenses') %> (<%= expenses.length %>)</h2>
+  <div class="tablewrap mb-3">
+    <table class="data">
+      <thead><tr>
+        <th>#</th><th><%= t('date') %></th><th><%= t('title') %></th>
+        <th><%= t('category') %></th><th><%= t('vendor') %></th><th class="num"><%= t('amount') %></th>
+      </tr></thead>
+      <tbody>
+        <% expenses.forEach(function(e, i){ %>
+          <tr>
+            <td><%= i + 1 %></td><td><%= h.formatDate(e.spent_on) %></td><td><%= e.title %></td>
+            <td><%= e.category %></td><td><%= e.vendor %></td>
+            <td class="num"><%= h.formatMoney(e.amount, currency) %></td>
+          </tr>
+        <% }); %>
+        <% if (!expenses.length) { %><tr><td colspan="6" class="muted">No entries</td></tr><% } %>
+      </tbody>
+      <tfoot><tr>
+        <th colspan="5"><%= t('total') %></th>
+        <th class="num"><%= h.formatMoney(r.spent, currency) %></th>
+      </tr></tfoot>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="flex-between big bold">
+      <span><%= t('in_hand') %></span>
+      <span><%= h.formatMoney(r.inHand, currency) %></span>
+    </div>
+  </div>
+
+  <div class="receipt__sign mt-3">
+    <div><%= t('treasurer') %><br><b><%= settings.treasurer_name || '—' %></b></div>
+    <div><%= t('secretary') %><br><b><%= settings.secretary_name || '—' %></b></div>
+    <div><%= t('president') %><br><b><%= settings.president_name || '—' %></b></div>
+  </div>
+
+  <p class="center muted mt-3">🙏 Ganpati Bappa Morya 🙏</p>
+</div></div>
+<script src="/js/app.js" defer></script>
+</body>
+</html>

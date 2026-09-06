@@ -1,0 +1,77 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <h1>📢 <%= t('announcements') %></h1>
+</div>
+
+<div class="card">
+  <h3><%= t('add_new') %></h3>
+  <form method="post" action="/announcements/new">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="field">
+      <label for="atitle"><%= t('title') %> *</label>
+      <input type="text" id="atitle" name="title" required placeholder="e.g. Mahaprasad on Sunday">
+    </div>
+    <div class="field">
+      <label for="abody"><%= t('message') %></label>
+      <textarea id="abody" name="body" placeholder="Write the details here…"></textarea>
+    </div>
+    <label class="check">
+      <input type="checkbox" name="pinned" value="1">
+      <span>📌 Pin to top (also shows on Home)</span>
+    </label>
+    <button class="btn btn--primary btn--lg" type="submit">📢 Post</button>
+  </form>
+</div>
+
+<% if (announcements.length) { %>
+  <% announcements.forEach(function(a){ %>
+    <div class="card">
+      <div class="flex-between mb-1">
+        <h3 class="mb-0"><% if (a.pinned) { %>📌 <% } %><%= a.title %></h3>
+        <span class="badge"><%= h.formatDate(a.created_at) %></span>
+      </div>
+      <% if (a.body) { %><p style="white-space:pre-wrap"><%= a.body %></p><% } %>
+
+      <details>
+        <summary class="btn btn--ghost btn--sm" style="display:inline-flex"><%= t('edit') %></summary>
+        <form method="post" action="/announcements/<%= a.id %>/edit" class="mt-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="field">
+            <label for="t<%= a.id %>"><%= t('title') %></label>
+            <input type="text" id="t<%= a.id %>" name="title" value="<%= a.title %>">
+          </div>
+          <div class="field">
+            <label for="b<%= a.id %>"><%= t('message') %></label>
+            <textarea id="b<%= a.id %>" name="body"><%= a.body %></textarea>
+          </div>
+          <label class="check <%= a.pinned ? 'check--on' : '' %>">
+            <input type="checkbox" name="pinned" value="1" <%= a.pinned ? 'checked' : '' %>>
+            <span>📌 Pinned</span>
+          </label>
+          <button class="btn btn--primary btn--sm" type="submit">💾 <%= t('save') %></button>
+        </form>
+      </details>
+
+      <hr class="divider">
+      <div class="btnrow">
+        <a class="btn btn--whatsapp" href="<%= a.shareLink %>" target="_blank" rel="noopener" data-share="#share<%= a.id %>">
+          💬 <%= t('share') %>
+        </a>
+        <button class="btn btn--ghost btn--sm" type="button" data-copy="#share<%= a.id %>" data-copy-msg="<%= t('copied') %>">📋 <%= t('copy') %></button>
+        <form method="post" action="/announcements/<%= a.id %>/delete" data-confirm="<%= t('confirm_delete') %>" data-no-lock style="margin:0">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn--ghost btn--sm" type="submit">🗑</button>
+        </form>
+      </div>
+      <textarea id="share<%= a.id %>" class="visually-hidden" readonly aria-hidden="true"><%= a.shareText %></textarea>
+    </div>
+  <% }); %>
+<% } else { %>
+  <div class="card empty">
+    <div class="empty__ic">📢</div>
+    <p><%= t('none_yet') %></p>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

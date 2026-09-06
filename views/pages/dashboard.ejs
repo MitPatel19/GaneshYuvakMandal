@@ -1,0 +1,185 @@
+<%- include('../partials/header') %>
+
+<section class="hero">
+  <h1><%= settings.mandal_name %></h1>
+  <p class="hero__tagline"><%= settings.tagline %></p>
+
+  <div class="hero__count">
+    <% if (countdown.state === 'before') { %>
+      <span class="hero__num"><%= countdown.days %></span>
+      <span class="hero__label"><%= t('days_to_go') %> 🎉</span>
+    <% } else if (countdown.state === 'during') { %>
+      <span class="hero__num"><%= countdown.dayNo %></span>
+      <span class="hero__label"><%= t('festival_running') %> · Day <%= countdown.dayNo %></span>
+    <% } else if (countdown.state === 'after') { %>
+      <span class="hero__label">🙏 <%= t('festival_over') %> — Pudhchya Varshi Lavkar Ya!</span>
+    <% } else { %>
+      <span class="hero__label">Set your festival dates in <a href="/settings" style="color:#ffe08a">Settings</a></span>
+    <% } %>
+  </div>
+
+  <div class="hero__dates">
+    <span>🪔 <%= t('festival_start') %>: <b><%= h.formatDate(settings.festival_start) %></b></span>
+    <span>🌊 <%= t('festival_end') %>: <b><%= h.formatDate(settings.festival_end) %></b></span>
+  </div>
+</section>
+
+<div class="grid grid--4 mb-3">
+  <a class="stat stat--in" href="/donations">
+    <div class="stat__label">💰 <%= t('collected') %></div>
+    <div class="stat__value"><%= h.formatMoney(collected, currency) %></div>
+    <div class="stat__hint"><%= donorCount %> <%= t('total_donors') %><% if (todayCollected > 0) { %> · <%= t('today') %> <%= h.formatMoney(todayCollected, currency) %><% } %></div>
+  </a>
+  <a class="stat stat--out" href="/expenses">
+    <div class="stat__label">🧾 <%= t('spent') %></div>
+    <div class="stat__value"><%= h.formatMoney(spent, currency) %></div>
+    <div class="stat__hint"><%= t('expenses') %></div>
+  </a>
+  <a class="stat stat--hand" href="/reports">
+    <div class="stat__label">🏦 <%= t('in_hand') %></div>
+    <div class="stat__value"><%= h.formatMoney(inHand, currency) %></div>
+    <div class="stat__hint"><%= t('reports') %> →</div>
+  </a>
+  <a class="stat stat--count" href="/members">
+    <div class="stat__label">👥 <%= t('total_members') %></div>
+    <div class="stat__value"><%= memberCount %></div>
+    <div class="stat__hint"><%= t('members') %> →</div>
+  </a>
+</div>
+
+<h2><%= t('quick_actions') %></h2>
+<div class="quickgrid mb-3">
+  <a class="quick quick--hot" href="/donations/new">
+    <span class="quick__ic" aria-hidden="true">➕</span><span><%= t('new_donation') %></span>
+  </a>
+  <a class="quick quick--wa" href="<%= inviteLink %>" target="_blank" rel="noopener" data-share="#inviteText">
+    <span class="quick__ic" aria-hidden="true">💬</span><span><%= t('invite_text') %></span>
+  </a>
+  <a class="quick" href="/expenses/new">
+    <span class="quick__ic" aria-hidden="true">🧾</span><span><%= t('new_expense') %></span>
+  </a>
+  <a class="quick" href="/schedule">
+    <span class="quick__ic" aria-hidden="true">📅</span><span><%= t('schedule') %></span>
+  </a>
+  <a class="quick" href="/duties">
+    <span class="quick__ic" aria-hidden="true">🪔</span><span><%= t('duties') %></span>
+  </a>
+  <a class="quick" href="/whatsapp">
+    <span class="quick__ic" aria-hidden="true">📣</span><span><%= t('whatsapp') %></span>
+  </a>
+  <a class="quick" href="/members/new">
+    <span class="quick__ic" aria-hidden="true">👤</span><span><%= t('members') %></span>
+  </a>
+  <a class="quick" href="/p" target="_blank" rel="noopener">
+    <span class="quick__ic" aria-hidden="true">🌐</span><span><%= t('public_page') %></span>
+  </a>
+</div>
+<textarea id="inviteText" class="visually-hidden" readonly aria-hidden="true"><%= inviteText %></textarea>
+
+<% if (pinned.length) { %>
+  <div class="card card--flush">
+    <div class="card__head"><h2>📢 <%= t('announcements') %></h2>
+      <a class="btn btn--ghost btn--sm" href="/announcements"><%= t('edit') %></a>
+    </div>
+    <ul class="list">
+      <% pinned.forEach(function(a){ %>
+        <li class="list__item">
+          <div class="list__main">
+            <div class="list__title"><% if (a.pinned) { %>📌 <% } %><%= a.title %></div>
+            <div class="list__meta"><%= h.truncate(a.body, 150) %></div>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>
+
+<div class="grid grid--2">
+  <div class="card card--flush">
+    <div class="card__head">
+      <h2>📅 <%= t('todays_program') %></h2>
+      <a class="btn btn--ghost btn--sm" href="/schedule"><%= t('add') %></a>
+    </div>
+    <% if (todayEvents.length) { %>
+      <div>
+        <% todayEvents.forEach(function(e){ %>
+          <div class="slot">
+            <div class="slot__time"><%= h.timeRange(e.start_time, e.end_time) || '—' %></div>
+            <div class="slot__main">
+              <div class="slot__title"><%= e.title %></div>
+              <div class="slot__meta">
+                <span class="badge"><%= e.category %></span>
+                <% if (e.place) { %> 📍 <%= e.place %><% } %>
+                <% if (e.incharge) { %> · 👤 <%= e.incharge %><% } %>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty">
+        <div class="empty__ic">📅</div>
+        <p>No program listed for today.</p>
+        <a class="btn btn--primary btn--sm" href="/schedule/new?date=<%= today %>"><%= t('new_event') %></a>
+      </div>
+    <% } %>
+
+    <% if (todayDuties.length) { %>
+      <div class="card__foot">
+        <div class="bold mb-1">🪔 <%= t('duties') %> — <%= t('today') %></div>
+        <% todayDuties.forEach(function(d){ %>
+          <div class="small"><b><%= d.slot %></b>: <%= d.member_name %></div>
+        <% }); %>
+        <a class="btn btn--ghost btn--sm mt-1" href="/duties"><%= t('remind_all') %> →</a>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="card card--flush">
+    <div class="card__head">
+      <h2>💰 <%= t('recent_donations') %></h2>
+      <a class="btn btn--ghost btn--sm" href="/donations"><%= t('total') %></a>
+    </div>
+    <% if (recentDonations.length) { %>
+      <ul class="list">
+        <% recentDonations.forEach(function(d){ %>
+          <li class="list__item">
+            <span class="avatar" aria-hidden="true"><%= h.initials(d.donor_name) %></span>
+            <div class="list__main">
+              <div class="list__title"><%= d.donor_name %></div>
+              <div class="list__meta"><%= h.formatDate(d.donated_on) %> · <%= d.mode %></div>
+            </div>
+            <div class="list__side">
+              <div class="money-in"><%= h.formatMoney(d.amount, currency) %></div>
+              <a class="small" href="/donations/<%= d.id %>/receipt"><%= t('receipt') %></a>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <div class="empty">
+        <div class="empty__ic">💰</div>
+        <p>No donation recorded yet.</p>
+        <a class="btn btn--primary btn--sm" href="/donations/new"><%= t('new_donation') %></a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<% if (upcomingEvents.length) { %>
+  <div class="card card--flush mt-2">
+    <div class="card__head"><h2>⏭ <%= t('upcoming') %></h2></div>
+    <ul class="list">
+      <% upcomingEvents.forEach(function(e){ %>
+        <li class="list__item">
+          <div class="list__main">
+            <div class="list__title"><%= e.title %></div>
+            <div class="list__meta"><%= h.formatDateLong(e.event_date) %> · <%= h.timeRange(e.start_time, e.end_time) %></div>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

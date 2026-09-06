@@ -1,0 +1,129 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>🪔 <%= t('duties') %></h1>
+    <div class="pagehead__sub"><%= h.formatDateLong(date) %> · <%= duties.length %> assigned</div>
+  </div>
+</div>
+
+<div class="card">
+  <form method="get" action="/duties" class="searchbar mb-0" data-no-lock>
+    <input type="date" name="date" value="<%= date %>" aria-label="<%= t('date') %>">
+    <button class="btn btn--ghost" type="submit">📆 Show day</button>
+  </form>
+  <% if (festivalDays.length) { %>
+    <div class="chips mt-1">
+      <% festivalDays.forEach(function(d){ %>
+        <a class="chip <%= d === date ? 'chip--active' : '' %>" href="/duties?date=<%= d %>">
+          <%= h.formatDate(d).replace(/ \d{4}$/, '') %>
+        </a>
+      <% }); %>
+    </div>
+  <% } %>
+</div>
+
+<div class="card">
+  <h3><%= t('assign_to') %></h3>
+  <form method="post" action="/duties/new">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="duty_date" value="<%= date %>">
+    <div class="formgrid">
+      <div class="field">
+        <label for="member_id"><%= t('members') %></label>
+        <select id="member_id" name="member_id">
+          <option value="">— <%= t('name') %> —</option>
+          <% members.forEach(function(m){ %>
+            <option value="<%= m.id %>"><%= m.name %><%= m.phone ? ' (' + m.phone + ')' : '' %></option>
+          <% }); %>
+        </select>
+        <div class="field__hint">Not in the list? Type a name below instead.</div>
+      </div>
+      <div class="field">
+        <label for="slot"><%= t('slot') %></label>
+        <select id="slot" name="slot">
+          <% slots.forEach(function(s){ %><option value="<%= s %>"><%= s %></option><% }); %>
+        </select>
+      </div>
+    </div>
+    <div class="formgrid">
+      <div class="field">
+        <label for="member_name">Or type a name</label>
+        <input type="text" id="member_name" name="member_name" placeholder="<%= t('name') %>">
+      </div>
+      <div class="field">
+        <label for="dphone"><%= t('phone') %></label>
+        <input type="tel" id="dphone" name="phone" inputmode="tel" placeholder="98765 43210">
+      </div>
+    </div>
+    <div class="field">
+      <label for="dnote"><%= t('note') %></label>
+      <input type="text" id="dnote" name="note" placeholder="e.g. bring prasad thali">
+    </div>
+    <button class="btn btn--primary btn--lg" type="submit">➕ <%= t('add') %></button>
+  </form>
+</div>
+
+<div class="card card--flush">
+  <div class="card__head">
+    <h2>🪔 <%= h.formatDate(date) %></h2>
+    <a class="btn btn--whatsapp btn--sm" href="<%= groupLink %>" target="_blank" rel="noopener" data-share="#groupText">
+      💬 Send full list
+    </a>
+  </div>
+  <textarea id="groupText" class="visually-hidden" readonly aria-hidden="true"><%= groupText %></textarea>
+
+  <% if (duties.length) { %>
+    <ul class="list">
+      <% duties.forEach(function(d){ %>
+        <li class="list__item">
+          <span class="avatar" aria-hidden="true"><%= h.initials(d.member_name) %></span>
+          <div class="list__main">
+            <div class="list__title"><%= d.member_name %></div>
+            <div class="list__meta">
+              <span class="badge badge--gold"><%= d.slot %></span>
+              <% if (d.phone) { %> · 📞 <%= d.phone %><% } %>
+              <% if (d.note) { %> · <%= d.note %><% } %>
+            </div>
+          </div>
+          <div class="list__actions">
+            <a class="btn btn--whatsapp btn--sm" href="<%= d.waLink %>" target="_blank" rel="noopener"
+               title="<%= t('remind') %>">💬 <%= t('remind') %></a>
+            <form method="post" action="/duties/<%= d.id %>/delete" data-confirm="<%= t('confirm_delete') %>" data-no-lock style="margin:0">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn--ghost btn--sm" type="submit">🗑</button>
+            </form>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  <% } else { %>
+    <div class="empty">
+      <div class="empty__ic">🪔</div>
+      <p>No duty assigned for this day yet.</p>
+    </div>
+  <% } %>
+</div>
+
+<% if (allCount > 0) { %>
+  <div class="card">
+    <h3>📄 Copy a day's roster</h3>
+    <p class="field__hint mb-2">Same volunteers on another day? Copy the whole list in one click.</p>
+    <form method="post" action="/duties/copy">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="formgrid">
+        <div class="field">
+          <label for="copyfrom">From</label>
+          <input type="date" id="copyfrom" name="from" value="<%= date %>">
+        </div>
+        <div class="field">
+          <label for="copyto">To</label>
+          <input type="date" id="copyto" name="to" value="<%= h.addDays(date, 1) %>">
+        </div>
+      </div>
+      <button class="btn btn--ghost" type="submit">📄 Copy</button>
+    </form>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

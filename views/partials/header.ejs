@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8e1b3a">
+<meta name="description" content="<%= settings.mandal_name %> — Ganpati Mahotsav <%= settings.year %>">
+<title><%= title %> · <%= settings.mandal_name %></title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/img/icon-192.png">
+</head>
+<body>
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<header class="topbar no-print">
+  <a class="topbar__brand" href="/dashboard">
+    <span class="topbar__logo" aria-hidden="true">🕉</span>
+    <span class="topbar__name"><%= settings.mandal_name %></span>
+  </a>
+  <span class="topbar__spacer"></span>
+  <div class="topbar__actions">
+    <button class="iconbtn hide-narrow" type="button" data-font="down" title="Smaller text" aria-label="Smaller text">A−</button>
+    <button class="iconbtn hide-narrow" type="button" data-font="up" title="Bigger text" aria-label="Bigger text">A+</button>
+    <div class="langmenu">
+      <button class="iconbtn" type="button" data-langtoggle aria-haspopup="true"
+              aria-label="<%= t('language') %> / text size">
+        🌐 <%= (languages.find(l => l.code === lang) || languages[0]).short %>
+      </button>
+      <div class="langmenu__list">
+        <div class="langmenu__group">Text size</div>
+        <div class="langmenu__sizes">
+          <button class="btn btn--ghost btn--sm" type="button" data-font="down" aria-label="Smaller text">A−</button>
+          <button class="btn btn--ghost btn--sm" type="button" data-font="up" aria-label="Bigger text">A+</button>
+        </div>
+        <div class="langmenu__group"><%= t('language') %></div>
+        <% languages.forEach(function(l){ %>
+          <a href="?lang=<%= l.code %>" aria-current="<%= l.code === lang %>"><%= l.label %></a>
+        <% }); %>
+      </div>
+    </div>
+    <% if (user) { %>
+      <form method="post" action="/logout" style="margin:0" data-no-lock>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="iconbtn" type="submit" title="<%= t('logout') %>" aria-label="<%= t('logout') %>">⏻</button>
+      </form>
+    <% } %>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidenav no-print" aria-label="Main">
+    <% navItems.forEach(function(item){ %>
+      <a class="sidenav__link <%= isActive(item.href) ? 'active' : '' %>" href="<%= item.href %>">
+        <span class="sidenav__icon" aria-hidden="true"><%= item.icon %></span>
+        <span><%= item.label %></span>
+      </a>
+    <% }); %>
+    <div class="sidenav__group"><%= t('share') %></div>
+    <a class="sidenav__link" href="/p" target="_blank" rel="noopener">
+      <span class="sidenav__icon" aria-hidden="true">🌐</span>
+      <span><%= t('public_page') %></span>
+    </a>
+  </nav>
+
+  <main class="page" id="main">
+    <div class="container">
+      <% if (typeof flash !== 'undefined' && flash) { %>
+        <div class="alert alert--ok" data-autohide role="status">
+          <span class="alert__ic">✅</span><span><%= flash %></span>
+        </div>
+      <% } %>
+      <% if (typeof errorMsg !== 'undefined' && errorMsg) { %>
+        <div class="alert alert--err" data-autohide role="alert">
+          <span class="alert__ic">⚠️</span><span><%= errorMsg %></span>
+        </div>
+      <% } %>

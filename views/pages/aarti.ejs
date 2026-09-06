@@ -1,0 +1,81 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <h1>📖 <%= t('aarti') %></h1>
+  <div class="pagehead__actions">
+    <button class="btn btn--ghost" type="button" data-lyric="down" aria-label="Smaller lyrics">A−</button>
+    <button class="btn btn--ghost" type="button" data-lyric="up" aria-label="Bigger lyrics">A+</button>
+    <% if (active) { %>
+      <a class="btn btn--whatsapp" href="<%= shareLink %>" target="_blank" rel="noopener">💬 <%= t('share') %></a>
+    <% } %>
+  </div>
+</div>
+
+<div class="chips mb-2">
+  <% aartis.forEach(function(a){ %>
+    <a class="chip <%= active && a.id === active.id ? 'chip--active' : '' %>" href="/aarti?id=<%= a.id %>"><%= a.title %></a>
+  <% }); %>
+</div>
+
+<% if (active) { %>
+  <div class="card">
+    <div class="flex-between mb-1">
+      <h2 class="mb-0"><%= active.title %></h2>
+      <span class="badge badge--gold"><%= active.language %></span>
+    </div>
+    <div class="lyrics"><%= active.lyrics %></div>
+  </div>
+
+  <details class="card no-print">
+    <summary class="bold" style="cursor:pointer"><%= t('edit') %></summary>
+    <form method="post" action="/aarti/<%= active.id %>/edit" class="mt-2">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="formgrid">
+        <div class="field">
+          <label for="atitle"><%= t('title') %></label>
+          <input type="text" id="atitle" name="title" value="<%= active.title %>">
+        </div>
+        <div class="field">
+          <label for="alang"><%= t('language') %></label>
+          <input type="text" id="alang" name="language" value="<%= active.language %>">
+        </div>
+      </div>
+      <div class="field">
+        <label for="alyrics">Lyrics</label>
+        <textarea id="alyrics" name="lyrics" style="min-height:280px"><%= active.lyrics %></textarea>
+      </div>
+      <div class="btnrow">
+        <button class="btn btn--primary" type="submit">💾 <%= t('save') %></button>
+      </div>
+    </form>
+    <form method="post" action="/aarti/<%= active.id %>/delete"
+          data-confirm="<%= t('confirm_delete') %>" data-no-lock class="mt-1">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn--ghost btn--sm" type="submit">🗑 <%= t('delete') %></button>
+    </form>
+  </details>
+<% } %>
+
+<details class="card no-print">
+  <summary class="bold" style="cursor:pointer">➕ <%= t('add_new') %></summary>
+  <form method="post" action="/aarti/new" class="mt-2">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="formgrid">
+      <div class="field">
+        <label for="ntitle"><%= t('title') %> *</label>
+        <input type="text" id="ntitle" name="title" required>
+      </div>
+      <div class="field">
+        <label for="nlang"><%= t('language') %></label>
+        <input type="text" id="nlang" name="language" placeholder="Marathi / Hindi / Gujarati">
+      </div>
+    </div>
+    <div class="field">
+      <label for="nlyrics">Lyrics</label>
+      <textarea id="nlyrics" name="lyrics" style="min-height:220px"></textarea>
+    </div>
+    <button class="btn btn--primary" type="submit">💾 <%= t('save') %></button>
+  </form>
+</details>
+
+<%- include('../partials/footer') %>

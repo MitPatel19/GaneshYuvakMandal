@@ -1,0 +1,55 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>👥 <%= t('members') %></h1>
+    <div class="pagehead__sub"><%= activeCount %> active · <%= members.length %> total</div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/members/export.csv">⬇ CSV</a>
+    <a class="btn btn--primary" href="/members/new">➕ <%= t('add_new') %></a>
+  </div>
+</div>
+
+<form class="searchbar" method="get" action="/members" data-no-lock>
+  <input type="search" name="q" value="<%= search %>" placeholder="<%= t('search') %> — <%= t('name') %>, <%= t('phone') %>, <%= t('role') %>">
+  <button class="btn btn--ghost" type="submit">🔍 <%= t('search') %></button>
+  <% if (search) { %><a class="btn btn--ghost" href="/members"><%= t('clear') %></a><% } %>
+</form>
+
+<div class="card card--flush">
+  <% if (members.length) { %>
+    <ul class="list">
+      <% members.forEach(function(m){ %>
+        <li class="list__item" style="<%= m.is_active ? '' : 'opacity:.55' %>">
+          <span class="avatar" aria-hidden="true"><%= h.initials(m.name) %></span>
+          <div class="list__main">
+            <div class="list__title"><%= m.name %> <% if (!m.is_active) { %><span class="badge">Inactive</span><% } %></div>
+            <div class="list__meta">
+              <span class="badge badge--gold"><%= m.role %></span>
+              <% if (m.phone) { %> 📞 <%= m.phone %><% } %>
+              <% if (m.address) { %> · <%= h.truncate(m.address, 40) %><% } %>
+            </div>
+          </div>
+          <div class="list__actions">
+            <% if (m.phone) { %>
+              <a class="btn btn--whatsapp btn--sm"
+                 href="<%= h.whatsappLink(m.phone, '🙏 Jai Shree Ganesh ' + m.name + ',\n\n', settings.country_code) %>"
+                 target="_blank" rel="noopener" title="<%= t('send_whatsapp') %>">💬</a>
+              <a class="btn btn--ghost btn--sm" href="<%= h.telLink(m.phone) %>" title="<%= t('call') %>">📞</a>
+            <% } %>
+            <a class="btn btn--ghost btn--sm" href="/members/<%= m.id %>/edit"><%= t('edit') %></a>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  <% } else { %>
+    <div class="empty">
+      <div class="empty__ic">👥</div>
+      <p><%= search ? 'No member matched your search.' : t('none_yet') %></p>
+      <a class="btn btn--primary" href="/members/new">➕ <%= t('add_new') %></a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

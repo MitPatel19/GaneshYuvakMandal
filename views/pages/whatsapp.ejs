@@ -1,0 +1,119 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>💬 <%= t('whatsapp') %></h1>
+    <div class="pagehead__sub">Write once, send to everyone — one tap per person.</div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/whatsapp/templates">📝 <%= t('templates') %></a>
+    <% if (groupLink) { %>
+      <a class="btn btn--whatsapp" href="<%= groupLink %>" target="_blank" rel="noopener">👥 Open group</a>
+    <% } %>
+  </div>
+</div>
+
+<!-- Step 1 : pick a ready message -->
+<div class="card">
+  <h3>1️⃣ <%= t('choose_template') %></h3>
+  <div class="field">
+    <label class="visually-hidden" for="templatePicker"><%= t('template') %></label>
+    <select id="templatePicker">
+      <option value="">— <%= t('choose_template') %> —</option>
+      <% templatesRendered.forEach(function(tp){ %>
+        <option value="<%= tp.id %>" data-body="<%= tp.rendered %>"><%= tp.category %> · <%= tp.name %></option>
+      <% }); %>
+    </select>
+    <div class="field__hint">Your mandal name, dates and UPI are filled in automatically.</div>
+  </div>
+</div>
+
+<!-- Step 2 : edit + preview -->
+<div class="card">
+  <h3>2️⃣ <%= t('message') %></h3>
+  <div class="field">
+    <label class="visually-hidden" for="messageBox"><%= t('message') %></label>
+    <textarea id="messageBox" style="min-height:190px" placeholder="Type your message here, or pick a template above…"><%= message %></textarea>
+  </div>
+
+  <div class="mb-2">
+    <div class="small muted mb-1">Tap to insert:</div>
+    <% tokens.forEach(function(tok){ %>
+      <span class="token" data-token="<%= tok %>"><%= tok %></span>
+    <% }); %>
+    <div class="field__hint"><code>{{name}}</code> is replaced with each person's own name.</div>
+  </div>
+
+  <div class="label"><%= t('preview') %></div>
+  <div class="wa-canvas">
+    <div class="wa-preview" id="messagePreview">…</div>
+  </div>
+
+  <div class="btnrow mt-2">
+    <button class="btn btn--ghost" type="button" data-copy="#messageBox" data-copy-msg="<%= t('copied') %>">📋 <%= t('copy') %></button>
+    <a class="btn btn--whatsapp" href="https://wa.me/?text=" target="_blank" rel="noopener"
+       data-wa-link="" data-wa-name="">💬 Send to a group / any contact</a>
+  </div>
+</div>
+
+<!-- Step 3 : recipients -->
+<div class="card card--flush">
+  <div class="card__head">
+    <h2>3️⃣ <%= t('recipients') %></h2>
+    <span class="badge"><%= recipients.length %></span>
+  </div>
+
+  <div class="card__body">
+    <div class="chips mb-2">
+      <% audiences.forEach(function(a){ %>
+        <a class="chip <%= a.key === audienceKey ? 'chip--active' : '' %>" href="/whatsapp?audience=<%= a.key %>">
+          <%= a.icon %> <%= a.label %>
+        </a>
+      <% }); %>
+    </div>
+
+    <div class="alert alert--warn">
+      <span class="alert__ic">👉</span>
+      <span><%= t('broadcast_help') %></span>
+    </div>
+
+    <div class="field">
+      <label class="visually-hidden" for="quickFilter"><%= t('search') %></label>
+      <input type="search" id="quickFilter" placeholder="🔍 <%= t('search') %> <%= t('name') %>…">
+    </div>
+
+    <% if (recipients.length) { %>
+      <% recipients.forEach(function(r){ %>
+        <div class="recipient" data-filterable="<%= r.name %> <%= r.raw %>">
+          <span class="avatar" aria-hidden="true"><%= h.initials(r.name) %></span>
+          <div class="recipient__name">
+            <%= r.name %>
+            <div class="recipient__phone">
+              <%= r.raw || 'No phone saved' %><% if (r.extra) { %> · <%= r.extra %><% } %>
+            </div>
+          </div>
+          <span class="recipient__tick" data-tick aria-hidden="true">○</span>
+          <a class="btn btn--whatsapp btn--sm" target="_blank" rel="noopener"
+             data-wa-link="<%= r.phone %>" data-wa-name="<%= r.name %>"
+             href="https://wa.me/<%= r.phone %>">💬 Send</a>
+        </div>
+      <% }); %>
+      <div id="filterEmpty" class="empty" style="display:none">
+        <p>No one matched that search.</p>
+      </div>
+    <% } else { %>
+      <div class="empty">
+        <div class="empty__ic">👥</div>
+        <p>No one in this list yet.</p>
+        <a class="btn btn--primary btn--sm" href="/members/new">➕ <%= t('members') %></a>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="card__foot small muted">
+    💡 Tip: WhatsApp opens with the message already typed — you only press the green send button.
+    Each name turns green ✅ once you have opened it, so you never lose your place.
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

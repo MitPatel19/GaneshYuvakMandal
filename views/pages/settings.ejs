@@ -1,0 +1,260 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <h1>⚙️ <%= t('settings') %></h1>
+</div>
+
+<form method="post" action="/settings">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <div class="card">
+    <h3>🕉 Mandal details</h3>
+    <div class="field">
+      <label for="mandal_name"><%= t('mandal_name') %></label>
+      <input type="text" id="mandal_name" name="mandal_name" value="<%= s.mandal_name %>">
+    </div>
+    <div class="formgrid">
+      <div class="field">
+        <label for="tagline"><%= t('tagline') %></label>
+        <input type="text" id="tagline" name="tagline" value="<%= s.tagline %>">
+      </div>
+      <div class="field">
+        <label for="year">Year</label>
+        <input type="text" id="year" name="year" value="<%= s.year %>" inputmode="numeric">
+      </div>
+    </div>
+    <div class="field">
+      <label for="address"><%= t('address') %></label>
+      <input type="text" id="address" name="address" value="<%= s.address %>">
+    </div>
+    <div class="field">
+      <label for="about">About / welcome message</label>
+      <textarea id="about" name="about" style="min-height:100px"><%= s.about %></textarea>
+    </div>
+    <div class="field">
+      <label for="google_maps_link">Google Maps link</label>
+      <input type="url" id="google_maps_link" name="google_maps_link" value="<%= s.google_maps_link %>"
+             placeholder="https://maps.app.goo.gl/…">
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📅 Mahotsav dates</h3>
+    <div class="formgrid">
+      <div class="field">
+        <label for="festival_start"><%= t('festival_start') %></label>
+        <input type="date" id="festival_start" name="festival_start" value="<%= s.festival_start %>">
+      </div>
+      <div class="field">
+        <label for="festival_end"><%= t('festival_end') %></label>
+        <input type="date" id="festival_end" name="festival_end" value="<%= s.festival_end %>">
+      </div>
+    </div>
+    <div class="field__hint">
+      Please confirm these with your panchang. The countdown, program days and duty
+      calendar all follow these two dates.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📞 <%= t('contacts') %></h3>
+    <div class="formgrid">
+      <div class="field">
+        <label for="president_name"><%= t('president') %></label>
+        <input type="text" id="president_name" name="president_name" value="<%= s.president_name %>">
+      </div>
+      <div class="field">
+        <label for="president_phone"><%= t('president') %> <%= t('phone') %></label>
+        <input type="tel" id="president_phone" name="president_phone" value="<%= s.president_phone %>" inputmode="tel">
+      </div>
+    </div>
+    <div class="formgrid">
+      <div class="field">
+        <label for="secretary_name"><%= t('secretary') %></label>
+        <input type="text" id="secretary_name" name="secretary_name" value="<%= s.secretary_name %>">
+      </div>
+      <div class="field">
+        <label for="secretary_phone"><%= t('secretary') %> <%= t('phone') %></label>
+        <input type="tel" id="secretary_phone" name="secretary_phone" value="<%= s.secretary_phone %>" inputmode="tel">
+      </div>
+    </div>
+    <div class="formgrid">
+      <div class="field">
+        <label for="treasurer_name"><%= t('treasurer') %></label>
+        <input type="text" id="treasurer_name" name="treasurer_name" value="<%= s.treasurer_name %>">
+      </div>
+      <div class="field">
+        <label for="treasurer_phone"><%= t('treasurer') %> <%= t('phone') %></label>
+        <input type="tel" id="treasurer_phone" name="treasurer_phone" value="<%= s.treasurer_phone %>" inputmode="tel">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>💳 Online donation (UPI)</h3>
+    <div class="formgrid">
+      <div class="field">
+        <label for="upi_id"><%= t('upi_id') %></label>
+        <input type="text" id="upi_id" name="upi_id" value="<%= s.upi_id %>" placeholder="mandal@okaxis"
+               autocapitalize="none" autocorrect="off">
+      </div>
+      <div class="field">
+        <label for="upi_name"><%= t('upi_name') %></label>
+        <input type="text" id="upi_name" name="upi_name" value="<%= s.upi_name %>">
+      </div>
+    </div>
+    <% if (qrDataUrl) { %>
+      <div class="center mt-2">
+        <img class="qr" src="<%= qrDataUrl %>" alt="UPI QR code">
+        <div class="small muted mt-1"><%= t('scan_to_pay') %> — this QR appears on receipts and your public page.</div>
+      </div>
+    <% } else { %>
+      <p class="field__hint">Add your UPI ID and a payment QR code will be created automatically.</p>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <h3>🌐 <%= t('public_page') %></h3>
+    <p class="field__hint mb-2">A simple page anyone can open — program, timings, location and donation QR.
+      Nothing private is shown.</p>
+
+    <label class="check <%= s.public_page_enabled === '1' ? 'check--on' : '' %>">
+      <input type="checkbox" name="public_page_enabled" value="1" <%= s.public_page_enabled === '1' ? 'checked' : '' %>>
+      <span>Publish the public page</span>
+    </label>
+    <label class="check <%= s.public_show_donors === '1' ? 'check--on' : '' %>">
+      <input type="checkbox" name="public_show_donors" value="1" <%= s.public_show_donors === '1' ? 'checked' : '' %>>
+      <span>Show donor names (thank-you board)</span>
+    </label>
+    <label class="check <%= s.public_show_total === '1' ? 'check--on' : '' %>">
+      <input type="checkbox" name="public_show_total" value="1" <%= s.public_show_total === '1' ? 'checked' : '' %>>
+      <span>Show total amount collected</span>
+    </label>
+
+    <div class="field mt-2">
+      <label for="publicUrl">Your public link</label>
+      <input type="text" id="publicUrl" value="<%= publicUrl %>" readonly>
+    </div>
+    <div class="btnrow">
+      <a class="btn btn--whatsapp" href="<%= publicShareLink %>" target="_blank" rel="noopener">💬 Share link</a>
+      <button class="btn btn--ghost" type="button" data-copy="#publicUrl" data-copy-msg="<%= t('copied') %>">📋 <%= t('copy') %></button>
+      <a class="btn btn--ghost" href="/p" target="_blank" rel="noopener">👁 <%= t('preview') %></a>
+    </div>
+
+    <div class="field mt-2">
+      <label for="whatsapp_group_link">WhatsApp group invite link</label>
+      <input type="url" id="whatsapp_group_link" name="whatsapp_group_link" value="<%= s.whatsapp_group_link %>"
+             placeholder="https://chat.whatsapp.com/…">
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🌐 <%= t('language') %> & format</h3>
+    <div class="formgrid">
+      <div class="field">
+        <label for="language">Default <%= t('language') %></label>
+        <select id="language" name="language">
+          <% languages.forEach(function(l){ %>
+            <option value="<%= l.code %>" <%= s.language === l.code ? 'selected' : '' %>><%= l.label %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="field">
+        <label for="currency">Currency symbol</label>
+        <input type="text" id="currency" name="currency" value="<%= s.currency %>" maxlength="3">
+      </div>
+    </div>
+    <div class="field">
+      <label for="country_code">Phone country code (for WhatsApp)</label>
+      <input type="text" id="country_code" name="country_code" value="<%= s.country_code %>" inputmode="numeric" maxlength="4">
+      <div class="field__hint">91 for India. 10-digit numbers get this prefix automatically.</div>
+    </div>
+  </div>
+
+  <div class="btnrow mb-3">
+    <button class="btn btn--primary btn--lg" type="submit">💾 <%= t('save') %></button>
+  </div>
+</form>
+
+<div class="card">
+  <h3>🔐 <%= t('change_password') %></h3>
+  <form method="post" action="/settings/password">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="formgrid">
+      <div class="field">
+        <label for="current_password">Current password</label>
+        <input type="password" id="current_password" name="current_password" autocomplete="current-password" required>
+      </div>
+      <div class="field">
+        <label for="new_password"><%= t('new_password') %></label>
+        <input type="password" id="new_password" name="new_password" autocomplete="new-password" minlength="6" required>
+      </div>
+    </div>
+    <button class="btn btn--primary" type="submit">🔐 <%= t('save') %></button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>👤 Extra logins</h3>
+  <p class="field__hint mb-2">Give the treasurer or secretary their own login instead of sharing one password.</p>
+  <form method="post" action="/settings/users/new">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="formgrid">
+      <div class="field">
+        <label for="nu"><%= t('username') %></label>
+        <input type="text" id="nu" name="username" autocapitalize="none" placeholder="treasurer" required>
+      </div>
+      <div class="field">
+        <label for="nd">Display name</label>
+        <input type="text" id="nd" name="display_name">
+      </div>
+    </div>
+    <div class="field">
+      <label for="np"><%= t('password') %></label>
+      <input type="password" id="np" name="password" minlength="6" autocomplete="new-password" required>
+    </div>
+    <button class="btn btn--ghost" type="submit">➕ <%= t('add') %></button>
+  </form>
+
+  <% if (users.length) { %>
+    <hr class="divider">
+    <ul class="list">
+      <% users.forEach(function(u){ %>
+        <li class="list__item" style="padding-left:0;padding-right:0">
+          <span class="avatar" aria-hidden="true"><%= h.initials(u.display_name || u.username) %></span>
+          <div class="list__main">
+            <div class="list__title"><%= u.username %><%= u.id === user.id ? ' (you)' : '' %></div>
+            <div class="list__meta"><%= u.display_name || '—' %></div>
+          </div>
+          <% if (u.id !== user.id && users.length > 1) { %>
+            <form method="post" action="/settings/users/<%= u.id %>/delete"
+                  data-confirm="<%= t('confirm_delete') %>" data-no-lock style="margin:0">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn--ghost btn--sm" type="submit">🗑</button>
+            </form>
+          <% } %>
+        </li>
+      <% }); %>
+    </ul>
+  <% } %>
+</div>
+
+<div class="card" style="border-color:#f0b4b4">
+  <h3 style="color:var(--danger-dark)">🧹 Start a new season</h3>
+  <p class="field__hint mb-2">
+    Clears donations, expenses, programs, duties and announcements so you can begin next
+    year fresh. <b>Members, photos, aartis, templates and settings are kept.</b>
+    Download a backup from <a href="/reports">Reports</a> first.
+  </p>
+  <form method="post" action="/settings/reset-season"
+        data-confirm="This will permanently delete all donations, expenses, programs, duties and announcements. Continue?" data-no-lock>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="field">
+      <label for="confirm">Type <b>RESET</b> to confirm</label>
+      <input type="text" id="confirm" name="confirm" placeholder="RESET" autocapitalize="characters">
+    </div>
+    <button class="btn btn--danger" type="submit">🧹 Start new season</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

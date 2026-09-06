@@ -1,0 +1,31 @@
+{
+  "name": "ganpati-mahotsav",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ganpati Mahotsav Manager - complete festival management web app for Ganesh Chaturthi mandals, with one-tap WhatsApp sharing.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20 <23"
+  },
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node scripts/seed-demo.js",
+    "reset": "node scripts/reset-db.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.10.0",
+    "cookie-session": "^2.1.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "multer": "^2.3.0",
+    "qrcode": "^1.5.4"
+  },
+  "overrides": {
+    "qs": "^6.16.0"
+  }
+}

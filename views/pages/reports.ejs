@@ -1,0 +1,134 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>📊 <%= t('reports') %></h1>
+    <div class="pagehead__sub">Hisab as on <%= h.formatDate(today) %></div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--whatsapp" href="<%= summaryLink %>" target="_blank" rel="noopener" data-share="#summaryText">💬 <%= t('share') %></a>
+    <a class="btn btn--ghost" href="/reports/print" target="_blank" rel="noopener">🖨 <%= t('print') %></a>
+    <a class="btn btn--ghost" href="/reports/backup.json">💾 Backup</a>
+  </div>
+</div>
+<textarea id="summaryText" class="visually-hidden" readonly aria-hidden="true"><%= summaryText %></textarea>
+
+<div class="grid grid--3 mb-3">
+  <div class="stat stat--in">
+    <div class="stat__label">💰 <%= t('collected') %></div>
+    <div class="stat__value"><%= h.formatMoney(r.collected, currency) %></div>
+    <div class="stat__hint"><%= r.counts.donations %> entries</div>
+  </div>
+  <div class="stat stat--out">
+    <div class="stat__label">🧾 <%= t('spent') %></div>
+    <div class="stat__value"><%= h.formatMoney(r.spent, currency) %></div>
+    <div class="stat__hint"><%= r.counts.expenses %> entries</div>
+  </div>
+  <div class="stat stat--hand">
+    <div class="stat__label">🏦 <%= t('in_hand') %></div>
+    <div class="stat__value"><%= h.formatMoney(r.inHand, currency) %></div>
+    <div class="stat__hint"><%= r.inHand < 0 ? '⚠️ Spent more than collected' : 'Balance' %></div>
+  </div>
+</div>
+
+<div class="grid grid--2">
+  <div class="card">
+    <h3>💳 Collection by payment mode</h3>
+    <div class="tablewrap">
+      <table class="data" style="min-width:0">
+        <thead><tr><th><%= t('payment_mode') %></th><th class="num">Count</th><th class="num"><%= t('total') %></th></tr></thead>
+        <tbody>
+          <% r.byMode.forEach(function(m){ %>
+            <tr><td><%= m.label %></td><td class="num"><%= m.count %></td><td class="num money-in"><%= h.formatMoney(m.total, currency) %></td></tr>
+          <% }); %>
+          <% if (!r.byMode.length) { %><tr><td colspan="3" class="muted"><%= t('none_yet') %></td></tr><% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🎯 Collection by purpose</h3>
+    <div class="tablewrap">
+      <table class="data" style="min-width:0">
+        <thead><tr><th><%= t('purpose') %></th><th class="num">Count</th><th class="num"><%= t('total') %></th></tr></thead>
+        <tbody>
+          <% r.byPurpose.forEach(function(m){ %>
+            <tr><td><%= m.label %></td><td class="num"><%= m.count %></td><td class="num money-in"><%= h.formatMoney(m.total, currency) %></td></tr>
+          <% }); %>
+          <% if (!r.byPurpose.length) { %><tr><td colspan="3" class="muted"><%= t('none_yet') %></td></tr><% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>🧾 Expenses by category</h3>
+  <% if (r.byCategory.length) { %>
+    <% r.byCategory.forEach(function(c){ %>
+      <div class="mb-1">
+        <div class="flex-between small">
+          <span class="bold"><%= c.label %></span>
+          <span class="money-out"><%= h.formatMoney(c.total, currency) %></span>
+        </div>
+        <div style="height:12px;border-radius:6px;background:var(--bg-alt);overflow:hidden">
+          <div style="height:100%;width:<%= r.maxCategory ? Math.max(3, Math.round(c.total / r.maxCategory * 100)) : 0 %>%;background:linear-gradient(90deg,var(--saffron),var(--maroon))"></div>
+        </div>
+      </div>
+    <% }); %>
+  <% } else { %><p class="muted"><%= t('none_yet') %></p><% } %>
+</div>
+
+<div class="card">
+  <h3>📆 Day-wise collection</h3>
+  <% if (r.daily.length) { %>
+    <div class="tablewrap">
+      <table class="data" style="min-width:0">
+        <thead><tr><th><%= t('date') %></th><th class="num">Donors</th><th class="num"><%= t('total') %></th></tr></thead>
+        <tbody>
+          <% r.daily.forEach(function(d){ %>
+            <tr>
+              <td><%= h.formatDate(d.date) %> <span class="faint small"><%= h.weekday(d.date) %></span></td>
+              <td class="num"><%= d.count %></td>
+              <td class="num money-in"><%= h.formatMoney(d.total, currency) %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %><p class="muted"><%= t('none_yet') %></p><% } %>
+</div>
+
+<div class="card card--flush">
+  <div class="card__head"><h2>🏆 Top donors</h2></div>
+  <% if (r.topDonors.length) { %>
+    <ul class="list">
+      <% r.topDonors.forEach(function(d, i){ %>
+        <li class="list__item">
+          <span class="avatar" aria-hidden="true"><%= i + 1 %></span>
+          <div class="list__main">
+            <div class="list__title"><%= d.donor_name %></div>
+            <div class="list__meta"><%= d.times %> contribution(s)<% if (d.phone) { %> · 📞 <%= d.phone %><% } %></div>
+          </div>
+          <div class="list__side money-in big"><%= h.formatMoney(d.total, currency) %></div>
+        </li>
+      <% }); %>
+    </ul>
+  <% } else { %>
+    <div class="empty"><div class="empty__ic">🏆</div><p><%= t('none_yet') %></p></div>
+  <% } %>
+</div>
+
+<div class="card">
+  <h3>⬇ Download</h3>
+  <div class="btnrow">
+    <a class="btn btn--ghost" href="/donations/export.csv">💰 Donations CSV</a>
+    <a class="btn btn--ghost" href="/expenses/export.csv">🧾 Expenses CSV</a>
+    <a class="btn btn--ghost" href="/members/export.csv">👥 Members CSV</a>
+    <a class="btn btn--ghost" href="/reports/backup.json">💾 Full backup (JSON)</a>
+  </div>
+  <p class="field__hint mt-1">Take a backup at the end of the Mahotsav and keep it safely.</p>
+</div>
+
+<%- include('../partials/footer') %>

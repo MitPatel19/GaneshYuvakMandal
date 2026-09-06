@@ -1,0 +1,52 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>📸 <%= t('gallery') %></h1>
+    <div class="pagehead__sub"><%= photos.length %> photos · also shown on your public page</div>
+  </div>
+</div>
+
+<div class="card">
+  <h3><%= t('upload_photo') %></h3>
+  <form method="post" action="/gallery/upload?_csrf=<%= csrfToken %>" enctype="multipart/form-data">
+    <div class="field">
+      <label for="photos">Choose photos (up to 10)</label>
+      <input type="file" id="photos" name="photos" accept="image/*" multiple required
+             style="padding:12px;background:var(--surface)">
+      <div class="field__hint">JPG, PNG, WEBP or GIF · max <%= maxMb %> MB each</div>
+    </div>
+    <div class="field">
+      <label for="caption"><%= t('caption') %></label>
+      <input type="text" id="caption" name="caption" placeholder="e.g. Sthapana day 2026">
+    </div>
+    <button class="btn btn--primary btn--lg" type="submit">⬆ <%= t('upload_photo') %></button>
+  </form>
+</div>
+
+<% if (photos.length) { %>
+  <div class="gallery">
+    <% photos.forEach(function(p){ %>
+      <figure class="gallery__item" style="margin:0">
+        <a href="/uploads/<%= p.filename %>" target="_blank" rel="noopener">
+          <img src="/uploads/<%= p.filename %>" alt="<%= p.caption || 'Mahotsav photo' %>" loading="lazy">
+        </a>
+        <figcaption class="gallery__cap">
+          <div><%= p.caption || '—' %></div>
+          <form method="post" action="/gallery/<%= p.id %>/delete"
+                data-confirm="<%= t('confirm_delete') %>" data-no-lock class="mt-1">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn--ghost btn--sm" type="submit">🗑</button>
+          </form>
+        </figcaption>
+      </figure>
+    <% }); %>
+  </div>
+<% } else { %>
+  <div class="card empty">
+    <div class="empty__ic">📸</div>
+    <p><%= t('none_yet') %></p>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

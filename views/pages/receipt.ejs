@@ -1,0 +1,82 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead no-print">
+  <h1>🧾 <%= t('receipt') %></h1>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/donations">← <%= t('donations') %></a>
+    <a class="btn btn--ghost" href="/donations/<%= donation.id %>/edit"><%= t('edit') %></a>
+  </div>
+</div>
+
+<div class="receipt">
+  <div class="receipt__head">
+    <div style="font-size:2rem;line-height:1">🕉</div>
+    <div class="receipt__mandal"><%= settings.mandal_name %></div>
+    <% if (settings.address) { %><div class="receipt__sub"><%= settings.address %></div><% } %>
+    <div class="receipt__sub">Ganesh Mahotsav <%= settings.year %></div>
+    <div class="receipt__title"><%= t('receipt') %></div>
+  </div>
+
+  <div class="receipt__row"><span><%= t('receipt_no') %></span><span><%= donation.receipt_no || '—' %></span></div>
+  <div class="receipt__row"><span><%= t('date') %></span><span><%= h.formatDate(donation.donated_on) %></span></div>
+  <div class="receipt__row"><span><%= t('donor_name') %></span><span><%= donation.donor_name %></span></div>
+  <% if (donation.phone) { %>
+    <div class="receipt__row"><span><%= t('phone') %></span><span><%= donation.phone %></span></div>
+  <% } %>
+  <% if (donation.address) { %>
+    <div class="receipt__row"><span><%= t('address') %></span><span><%= donation.address %></span></div>
+  <% } %>
+  <div class="receipt__row"><span><%= t('purpose') %></span><span><%= donation.purpose %></span></div>
+  <div class="receipt__row"><span><%= t('payment_mode') %></span><span><%= donation.mode %></span></div>
+
+  <div class="receipt__amount">
+    <b><%= h.formatMoney(donation.amount, currency) %></b>
+    <span class="receipt__words"><%= h.amountInWords(donation.amount) %></span>
+  </div>
+
+  <% if (donation.note) { %>
+    <div class="receipt__row"><span><%= t('note') %></span><span><%= donation.note %></span></div>
+  <% } %>
+
+  <% if (qrDataUrl) { %>
+    <div class="center mt-2">
+      <img class="qr" src="<%= qrDataUrl %>" alt="UPI QR code" style="width:150px;height:150px">
+      <div class="small muted"><%= t('scan_to_pay') %> · <%= settings.upi_id %></div>
+    </div>
+  <% } %>
+
+  <div class="receipt__foot">
+    🙏 Thank you for your contribution. May Bappa bless you and your family.
+  </div>
+
+  <div class="receipt__sign">
+    <div><%= t('received_by') %><br><b><%= donation.received_by || '—' %></b></div>
+    <div><%= t('treasurer') %><br><b><%= settings.treasurer_name || '—' %></b></div>
+  </div>
+</div>
+
+<div class="container-narrow no-print">
+  <div class="card">
+    <h3>💬 <%= t('send_receipt') %></h3>
+    <div class="wa-canvas mb-2">
+      <div class="wa-preview" id="thanksPreview"><%= thanksText %></div>
+    </div>
+    <textarea id="thanksText" class="visually-hidden" readonly aria-hidden="true"><%= thanksText %></textarea>
+    <div class="btnrow">
+      <a class="btn btn--whatsapp btn--lg" href="<%= waLink %>" target="_blank" rel="noopener">
+        💬 <%= donation.phone ? t('send_whatsapp') : t('share') %>
+      </a>
+      <button class="btn btn--ghost" type="button" data-copy="#thanksText" data-copy-msg="<%= t('copied') %>">📋 <%= t('copy') %></button>
+      <button class="btn btn--ghost" type="button" data-print>🖨 <%= t('print') %></button>
+    </div>
+    <% if (!donation.phone) { %>
+      <p class="field__hint mt-1">⚠️ No phone number saved for this donor — WhatsApp will ask you to pick a contact.</p>
+    <% } %>
+  </div>
+
+  <div class="btnrow">
+    <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

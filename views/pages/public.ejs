@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8e1b3a">
+<title><%= title %></title>
+<meta name="description" content="<%= h.truncate(settings.about, 150) %>">
+<meta property="og:title" content="<%= settings.mandal_name %> — Ganesh Mahotsav <%= settings.year %>">
+<meta property="og:description" content="<%= h.formatDate(settings.festival_start) %> to <%= h.formatDate(settings.festival_end) %><%= settings.address ? ' · ' + settings.address : '' %>">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<%= pageUrl %>">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+</head>
+<body>
+
+<header class="public-hero">
+  <div class="public-hero__om" aria-hidden="true">🕉</div>
+  <h1><%= settings.mandal_name %></h1>
+  <p><%= settings.tagline %></p>
+  <div class="public-hero__badge">
+    <% if (countdown.state === 'before') { %>
+      🎉 <%= countdown.days %> <%= t('days_to_go') %>
+    <% } else if (countdown.state === 'during') { %>
+      🪔 <%= t('festival_running') %> — Day <%= countdown.dayNo %>
+    <% } else if (countdown.state === 'after') { %>
+      🙏 Pudhchya Varshi Lavkar Ya!
+    <% } else { %>
+      🙏 Ganpati Bappa Morya
+    <% } %>
+  </div>
+  <p class="mt-2">
+    📅 <b><%= h.formatDate(settings.festival_start) %></b> — <b><%= h.formatDate(settings.festival_end) %></b>
+  </p>
+</header>
+
+<main class="page" style="padding-top:22px;padding-bottom:40px">
+<div class="container">
+
+  <div class="btnrow mb-3" style="justify-content:center">
+    <a class="btn btn--whatsapp btn--lg" href="<%= shareLink %>" target="_blank" rel="noopener" data-share="#shareText">
+      💬 <%= t('share') %>
+    </a>
+    <% if (upiLink) { %>
+      <a class="btn btn--saffron btn--lg" href="#donate">💳 <%= t('donate') %></a>
+    <% } %>
+    <% if (settings.google_maps_link) { %>
+      <a class="btn btn--ghost btn--lg" href="<%= settings.google_maps_link %>" target="_blank" rel="noopener">📍 Location</a>
+    <% } %>
+  </div>
+  <textarea id="shareText" class="visually-hidden" readonly aria-hidden="true"><%= shareText %></textarea>
+
+  <% if (settings.about) { %>
+    <div class="card center">
+      <p class="big mb-0" style="white-space:pre-wrap"><%= settings.about %></p>
+      <% if (settings.address) { %>
+        <p class="muted mt-2 mb-0">📍 <%= settings.address %></p>
+      <% } %>
+    </div>
+  <% } %>
+
+  <% if (announcements.length) { %>
+    <div class="card">
+      <h2>📢 <%= t('announcements') %></h2>
+      <% announcements.forEach(function(a){ %>
+        <div class="mb-2">
+          <div class="bold big"><% if (a.pinned) { %>📌 <% } %><%= a.title %></div>
+          <% if (a.body) { %><div class="muted" style="white-space:pre-wrap"><%= a.body %></div><% } %>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <h2 id="program">📅 <%= t('schedule') %></h2>
+  <% if (days.length) { %>
+    <% days.forEach(function(day){ %>
+      <section class="day">
+        <div class="day__head">
+          <span class="day__date"><%= h.formatDate(day.date) %></span>
+          <span class="day__dow"><%= h.weekday(day.date) %></span>
+          <% if (day.date === today) { %><span class="badge badge--today"><%= t('today') %></span><% } %>
+        </div>
+        <div class="day__body">
+          <% day.events.forEach(function(e){ %>
+            <div class="slot">
+              <div class="slot__time"><%= h.timeRange(e.start_time, e.end_time) || '—' %></div>
+              <div class="slot__main">
+                <div class="slot__title"><%= e.title %></div>
+                <div class="slot__meta">
+                  <span class="badge badge--gold"><%= e.category %></span>
+                  <% if (e.place) { %> 📍 <%= e.place %><% } %>
+                </div>
+                <% if (e.description) { %><div class="slot__meta"><%= e.description %></div><% } %>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+    <% }); %>
+  <% } else { %>
+    <div class="card empty">
+      <div class="empty__ic">📅</div>
+      <p>The program will be announced soon. Please check back.</p>
+    </div>
+  <% } %>
+
+  <% if (upiLink) { %>
+    <div class="card center" id="donate">
+      <h2>💳 <%= t('donate') %></h2>
+      <p class="muted">Scan with any UPI app — GPay, PhonePe, Paytm, BHIM.</p>
+      <% if (qrDataUrl) { %><img class="qr" src="<%= qrDataUrl %>" alt="UPI QR code"><% } %>
+      <p class="bold big mt-2"><%= settings.upi_id %></p>
+      <div class="btnrow" style="justify-content:center">
+        <a class="btn btn--saffron btn--lg" href="<%= upiLink %>">💳 Pay with UPI app</a>
+        <button class="btn btn--ghost" type="button" data-copy="<%= settings.upi_id %>" data-copy-msg="<%= t('copied') %>">📋 <%= t('copy') %> UPI ID</button>
+      </div>
+      <% if (totalCollected !== null) { %>
+        <p class="mt-2 mb-0 muted">Collected so far: <b class="money-in"><%= h.formatMoney(totalCollected, currency) %></b></p>
+      <% } %>
+    </div>
+  <% } %>
+
+  <% if (photos.length) { %>
+    <h2>📸 <%= t('gallery') %></h2>
+    <div class="gallery mb-3">
+      <% photos.forEach(function(p){ %>
+        <figure class="gallery__item" style="margin:0">
+          <img src="/uploads/<%= p.filename %>" alt="<%= p.caption || 'Mahotsav photo' %>" loading="lazy">
+          <% if (p.caption) { %><figcaption class="gallery__cap"><%= p.caption %></figcaption><% } %>
+        </figure>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <% if (aartis.length) { %>
+    <div class="card">
+      <h2>📖 <%= t('aarti') %></h2>
+      <div class="chips">
+        <% aartis.forEach(function(a){ %>
+          <a class="chip" href="/p/aarti/<%= a.id %>"><%= a.title %></a>
+        <% }); %>
+      </div>
+    </div>
+  <% } %>
+
+  <% if (topDonors.length) { %>
+    <div class="card card--flush">
+      <div class="card__head"><h2>🙏 Thank you to our donors</h2></div>
+      <ul class="list">
+        <% topDonors.forEach(function(d){ %>
+          <li class="list__item">
+            <span class="avatar" aria-hidden="true"><%= h.initials(d.donor_name) %></span>
+            <div class="list__main"><div class="list__title"><%= d.donor_name %></div></div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } %>
+
+  <% if (settings.president_phone || settings.secretary_phone || settings.treasurer_phone) { %>
+    <div class="card">
+      <h2>📞 <%= t('contacts') %></h2>
+      <% [
+        { role: t('president'), name: settings.president_name, phone: settings.president_phone },
+        { role: t('secretary'), name: settings.secretary_name, phone: settings.secretary_phone },
+        { role: t('treasurer'), name: settings.treasurer_name, phone: settings.treasurer_phone }
+      ].filter(function(c){ return c.phone; }).forEach(function(c){ %>
+        <div class="list__item" style="padding-left:0;padding-right:0">
+          <div class="list__main">
+            <div class="list__title"><%= c.name || c.role %></div>
+            <div class="list__meta"><%= c.role %> · <%= c.phone %></div>
+          </div>
+          <div class="list__actions">
+            <a class="btn btn--whatsapp btn--sm" href="<%= h.whatsappLink(c.phone, '🙏 Jai Shree Ganesh', settings.country_code) %>" target="_blank" rel="noopener">💬</a>
+            <a class="btn btn--ghost btn--sm" href="<%= h.telLink(c.phone) %>">📞</a>
+          </div>
+        </div>
+      <% }); %>
+      <% if (settings.whatsapp_group_link) { %>
+        <a class="btn btn--whatsapp btn--block mt-2" href="<%= settings.whatsapp_group_link %>" target="_blank" rel="noopener">
+          👥 Join our WhatsApp group
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+
+  <p class="center muted mt-3">🙏 Ganpati Bappa Morya · Mangal Murti Morya 🙏</p>
+  <p class="center faint small">
+    <a href="/login">Mandal login</a>
+  </p>
+</div>
+</main>
+
+<script src="/js/app.js" defer></script>
+</body>
+</html>

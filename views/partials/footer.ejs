@@ -1,0 +1,16 @@
+    </div>
+  </main>
+</div>
+
+<nav class="bottomnav no-print" aria-label="Quick navigation">
+  <% navItems.filter(i => i.primary).forEach(function(item){ %>
+    <a class="bottomnav__link <%= isActive(item.href) ? 'active' : '' %>" href="<%= item.href %>">
+      <span class="ic" aria-hidden="true"><%= item.icon %></span>
+      <span><%= item.label %></span>
+    </a>
+  <% }); %>
+</nav>
+
+<script src="/js/app.js" defer></script>
+</body>
+</html>

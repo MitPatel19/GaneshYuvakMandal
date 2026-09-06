@@ -1,0 +1,87 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>📅 <%= t('schedule') %></h1>
+    <div class="pagehead__sub"><%= eventCount %> programs · <%= h.formatDate(settings.festival_start) %> → <%= h.formatDate(settings.festival_end) %></div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--primary" href="/schedule/new">➕ <%= t('new_event') %></a>
+  </div>
+</div>
+
+<div class="card">
+  <h3 class="mb-1">💬 <%= t('share_schedule') %></h3>
+  <p class="field__hint mb-2">Send the program to your WhatsApp group or to any contact.</p>
+  <div class="btnrow">
+    <a class="btn btn--whatsapp" href="<%= shareAllLink %>" target="_blank" rel="noopener" data-share="#shareAllText">
+      💬 Full program
+    </a>
+    <% if (hasToday) { %>
+      <a class="btn btn--saffron" href="<%= shareTodayLink %>" target="_blank" rel="noopener" data-share="#shareTodayText">
+        📆 <%= t('today') %> only
+      </a>
+    <% } %>
+    <button class="btn btn--ghost" type="button" data-copy="#shareAllText" data-copy-msg="<%= t('copied') %>">📋 <%= t('copy') %></button>
+    <button class="btn btn--ghost" type="button" data-print>🖨 <%= t('print') %></button>
+  </div>
+  <textarea id="shareAllText" class="visually-hidden" readonly aria-hidden="true"><%= shareAll %></textarea>
+  <textarea id="shareTodayText" class="visually-hidden" readonly aria-hidden="true"><%= shareToday %></textarea>
+</div>
+
+<% if (!eventCount) { %>
+  <div class="card center">
+    <div class="empty__ic">✨</div>
+    <h3>Start with a ready-made program</h3>
+    <p class="muted">We can create Sthapana, daily morning &amp; evening aarti, Maha Prasad and Visarjan
+      for every day of your Mahotsav. You can edit or delete anything afterwards.</p>
+    <form method="post" action="/schedule/quick-setup">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn--primary btn--lg" type="submit">✨ Create starter program</button>
+    </form>
+  </div>
+<% } %>
+
+<% days.forEach(function(day){ %>
+  <section class="day">
+    <div class="day__head">
+      <span class="day__date"><%= h.formatDate(day.date) %></span>
+      <span class="day__dow"><%= h.weekday(day.date) %></span>
+      <% if (day.date === today) { %><span class="badge badge--today"><%= t('today') %></span><% } %>
+      <span style="flex:1"></span>
+      <a class="btn btn--ghost btn--sm no-print" href="/schedule/new?date=<%= day.date %>">➕</a>
+    </div>
+    <div class="day__body">
+      <% if (day.events.length) { %>
+        <% day.events.forEach(function(e){ %>
+          <div class="slot">
+            <div class="slot__time"><%= h.timeRange(e.start_time, e.end_time) || '—' %></div>
+            <div class="slot__main">
+              <div class="slot__title">
+                <%= e.title %>
+                <% if (!e.is_public) { %><span class="badge">Internal</span><% } %>
+              </div>
+              <div class="slot__meta">
+                <span class="badge badge--gold"><%= e.category %></span>
+                <% if (e.place) { %> 📍 <%= e.place %><% } %>
+                <% if (e.incharge) { %> · 👤 <%= e.incharge %><% } %>
+              </div>
+              <% if (e.description) { %><div class="slot__meta"><%= e.description %></div><% } %>
+            </div>
+            <div class="list__actions no-print">
+              <a class="btn btn--ghost btn--sm" href="/schedule/<%= e.id %>/edit"><%= t('edit') %></a>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="slot muted">
+          <div class="slot__main">No program on this day.
+            <a class="no-print" href="/schedule/new?date=<%= day.date %>"><%= t('add') %> →</a>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </section>
+<% }); %>
+
+<%- include('../partials/footer') %>

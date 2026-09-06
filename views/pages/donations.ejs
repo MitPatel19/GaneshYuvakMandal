@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>💰 <%= t('donations') %></h1>
+    <div class="pagehead__sub"><%= count %> entries · <b class="money-in"><%= h.formatMoney(total, currency) %></b></div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/donations/export.csv?<%= new URLSearchParams(filters).toString() %>">⬇ CSV</a>
+    <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+  </div>
+</div>
+
+<form class="searchbar" method="get" action="/donations" data-no-lock>
+  <input type="search" name="q" value="<%= filters.q %>" placeholder="<%= t('search') %> — <%= t('donor_name') %>, <%= t('phone') %>, <%= t('receipt_no') %>">
+  <select name="mode" aria-label="<%= t('payment_mode') %>">
+    <option value="">— <%= t('payment_mode') %> —</option>
+    <% modes.forEach(function(m){ %>
+      <option value="<%= m %>" <%= filters.mode === m ? 'selected' : '' %>><%= m %></option>
+    <% }); %>
+  </select>
+  <input type="date" name="from" value="<%= filters.from %>" aria-label="From date" style="flex:0 1 165px">
+  <input type="date" name="to" value="<%= filters.to %>" aria-label="To date" style="flex:0 1 165px">
+  <button class="btn btn--ghost" type="submit">🔍</button>
+  <% if (filters.q || filters.mode || filters.from || filters.to) { %>
+    <a class="btn btn--ghost" href="/donations"><%= t('clear') %></a>
+  <% } %>
+</form>
+
+<div class="card card--flush">
+  <% if (donations.length) { %>
+    <ul class="list">
+      <% donations.forEach(function(d){ %>
+        <li class="list__item">
+          <span class="avatar" aria-hidden="true"><%= h.initials(d.donor_name) %></span>
+          <div class="list__main">
+            <div class="list__title"><%= d.donor_name %></div>
+            <div class="list__meta">
+              <%= h.formatDate(d.donated_on) %>
+              · <span class="badge badge--in"><%= d.mode %></span>
+              <% if (d.receipt_no) { %> · <%= d.receipt_no %><% } %>
+              <% if (d.phone) { %> · 📞 <%= d.phone %><% } %>
+            </div>
+          </div>
+          <div class="list__side">
+            <div class="money-in big"><%= h.formatMoney(d.amount, currency) %></div>
+          </div>
+          <div class="list__actions">
+            <a class="btn btn--saffron btn--sm" href="/donations/<%= d.id %>/receipt">🧾</a>
+            <a class="btn btn--ghost btn--sm" href="/donations/<%= d.id %>/edit"><%= t('edit') %></a>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+    <div class="card__foot flex-between">
+      <span class="bold"><%= t('total') %></span>
+      <span class="money-in big"><%= h.formatMoney(total, currency) %></span>
+    </div>
+  <% } else { %>
+    <div class="empty">
+      <div class="empty__ic">💰</div>
+      <p><%= t('none_yet') %></p>
+      <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
