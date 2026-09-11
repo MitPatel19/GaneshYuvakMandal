@@ -109,15 +109,17 @@ app.use((req, res, next) => {
   res.locals.navItems = [
     { href: '/dashboard',     icon: '🏠', label: t('dashboard'),     primary: true },
     { href: '/donations',     icon: '💰', label: t('donations'),     primary: true },
+    { href: '/seva',          icon: '🍛', label: t('seva'),          primary: true },
     { href: '/schedule',      icon: '📅', label: t('schedule'),      primary: true },
     { href: '/whatsapp',      icon: '💬', label: t('whatsapp'),      primary: true },
-    { href: '/members',       icon: '👥', label: t('members'),       primary: true },
+    { href: '/members',       icon: '👥', label: t('members') },
     { href: '/expenses',      icon: '🧾', label: t('expenses') },
     { href: '/duties',        icon: '🪔', label: t('duties') },
     { href: '/announcements', icon: '📢', label: t('announcements') },
     { href: '/gallery',       icon: '📸', label: t('gallery') },
     { href: '/aarti',         icon: '📖', label: t('aarti') },
     { href: '/reports',       icon: '📊', label: t('reports') },
+    { href: '/qr',            icon: '🔳', label: t('qr_poster') },
     { href: '/settings',      icon: '⚙️', label: t('settings') },
   ];
   res.locals.isActive = (href) =>
@@ -146,6 +148,7 @@ app.use('/', require('./routes/public'));
 app.use('/dashboard', requireLogin, require('./routes/dashboard'));
 app.use('/members', requireLogin, require('./routes/members'));
 app.use('/donations', requireLogin, require('./routes/donations'));
+app.use('/seva', requireLogin, require('./routes/seva'));
 app.use('/expenses', requireLogin, require('./routes/expenses'));
 app.use('/schedule', requireLogin, require('./routes/schedule'));
 app.use('/duties', requireLogin, require('./routes/duties'));
@@ -154,6 +157,7 @@ app.use('/whatsapp', requireLogin, require('./routes/whatsapp'));
 app.use('/gallery', requireLogin, require('./routes/gallery'));
 app.use('/aarti', requireLogin, require('./routes/aarti'));
 app.use('/reports', requireLogin, require('./routes/reports'));
+app.use('/qr', requireLogin, require('./routes/qr'));
 app.use('/settings', requireLogin, require('./routes/settings'));
 
 /* ------------------------------------------------------------------ */

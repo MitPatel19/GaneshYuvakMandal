@@ -55,6 +55,9 @@
   <a class="quick quick--wa" href="<%= inviteLink %>" target="_blank" rel="noopener" data-share="#inviteText">
     <span class="quick__ic" aria-hidden="true">💬</span><span><%= t('invite_text') %></span>
   </a>
+  <a class="quick quick--hot" href="/seva/new?date=<%= today %>">
+    <span class="quick__ic" aria-hidden="true">🍛</span><span><%= t('seva_add') %></span>
+  </a>
   <a class="quick" href="/expenses/new">
     <span class="quick__ic" aria-hidden="true">🧾</span><span><%= t('new_expense') %></span>
   </a>
@@ -72,6 +75,9 @@
   </a>
   <a class="quick" href="/p" target="_blank" rel="noopener">
     <span class="quick__ic" aria-hidden="true">🌐</span><span><%= t('public_page') %></span>
+  </a>
+  <a class="quick" href="/qr">
+    <span class="quick__ic" aria-hidden="true">🔳</span><span><%= t('qr_poster') %></span>
   </a>
 </div>
 <textarea id="inviteText" class="visually-hidden" readonly aria-hidden="true"><%= inviteText %></textarea>
@@ -131,6 +137,35 @@
           <div class="small"><b><%= d.slot %></b>: <%= d.member_name %></div>
         <% }); %>
         <a class="btn btn--ghost btn--sm mt-1" href="/duties"><%= t('remind_all') %> →</a>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="card card--flush">
+    <div class="card__head">
+      <h2>🍛 <%= t('seva') %> — <%= t('today') %></h2>
+      <a class="btn btn--ghost btn--sm" href="/seva"><%= t('add') %></a>
+    </div>
+    <% if (todaySeva.length) { %>
+      <ul class="list">
+        <% todaySeva.forEach(function(sv){ %>
+          <li class="list__item">
+            <span class="avatar" aria-hidden="true" style="background:var(--bg-alt);font-size:1.2rem"><%= sv.icon %></span>
+            <div class="list__main">
+              <div class="list__title"><%= sv.donor_name %></div>
+              <div class="list__meta"><%= sv.label %></div>
+            </div>
+            <% if (sv.amount > 0) { %>
+              <div class="list__side money-in"><%= h.formatMoney(sv.amount, currency) %></div>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <div class="empty">
+        <div class="empty__ic">🍛</div>
+        <p><%= t('seva_none_yet') %></p>
+        <a class="btn btn--primary btn--sm" href="/seva?date=<%= today %>">➕ <%= t('seva_add') %></a>
       </div>
     <% } %>
   </div>

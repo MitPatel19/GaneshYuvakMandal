@@ -776,6 +776,63 @@ table.data td.num, table.data th.num { text-align: right; white-space: nowrap; }
 .flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .flex-between { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 
+/* ---------------------------------------------------------------------- */
+/*  QR poster — made to be printed on A4 and stuck up at the mandap        */
+/* ---------------------------------------------------------------------- */
+
+.qr-poster {
+  max-width: 560px;
+  margin: 0 auto 22px;
+  padding: 30px 26px 26px;
+  text-align: center;
+  background: #fff;
+  border: 3px solid var(--gold);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+.qr-poster__om { font-size: 3rem; line-height: 1; }
+.qr-poster__mandal {
+  font-family: var(--font-display);
+  font-size: 1.9rem; font-weight: 800; line-height: 1.2;
+  color: var(--maroon-dark);
+  margin-top: 4px;
+}
+.qr-poster__year { font-size: 1.05rem; color: var(--text-soft); margin-top: 2px; }
+.qr-poster__dates {
+  display: inline-block; margin-top: 10px; padding: 6px 18px;
+  border-radius: 999px; background: var(--bg-alt);
+  font-weight: 700; color: var(--maroon-dark);
+}
+.qr-poster__code {
+  width: 300px; max-width: 78vw; height: auto;
+  margin: 20px auto 14px;
+  padding: 10px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+}
+.qr-poster__scan { font-size: 1.25rem; font-weight: 800; color: var(--maroon-dark); }
+.qr-poster__url {
+  margin-top: 8px;
+  font-size: .82rem; color: var(--text-faint);
+  word-break: break-all;
+}
+.qr-poster__addr { margin-top: 14px; color: var(--text-soft); font-size: .95rem; }
+.qr-poster__morya {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 2px dashed var(--gold);
+  font-weight: 700; color: var(--saffron-dark);
+}
+
+@media print {
+  .qr-poster {
+    border-width: 2px; box-shadow: none;
+    max-width: none; margin: 0 auto;
+    page-break-inside: avoid;
+  }
+  .qr-poster__code { width: 330px; }
+}
+
 /* Developer credit — small, quiet, and out of the way */
 .credit {
   margin: 26px 0 4px;

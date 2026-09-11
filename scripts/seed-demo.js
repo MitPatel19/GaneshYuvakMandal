@@ -101,6 +101,9 @@ function seed() {
     'INSERT INTO duties (duty_date, slot, member_name, phone) VALUES (?, ?, ?, ?)'
   );
   const insAnn = db.prepare('INSERT INTO announcements (title, body, pinned) VALUES (?, ?, ?)');
+  const insSeva = db.prepare(
+    'INSERT INTO sevas (type_id, seva_date, donor_name, phone, amount) VALUES (?, ?, ?, ?, ?)'
+  );
 
   const year = getSetting('year');
   const place = getSetting('address');
@@ -154,6 +157,36 @@ function seed() {
       insDuty.run(date, 'Prasad Distribution', MEMBERS[(i + 5) % MEMBERS.length][0], MEMBERS[(i + 5) % MEMBERS.length][1]);
     });
 
+    // A few seva sponsors so the Seva screens are not empty on a demo install
+    const sevaTypes = db.prepare('SELECT * FROM seva_types ORDER BY sort_order, id').all();
+    const dailyTypes = sevaTypes.filter((t) => t.is_daily);
+    const onceTypes = sevaTypes.filter((t) => !t.is_daily);
+    const sponsors = [
+      ['Ramesh Trading Co.', '9820011001'],
+      ['Shri Vitthal Kirana Store', '9820011002'],
+      ['Dr. Anil Kulkarni', '9820011003'],
+      ['Sushila Ben Patel', '9820011004'],
+      ['Jayesh Furniture', '9820011005'],
+      ['Krishna Medical', '9820011008'],
+      ['Gokul Dairy', '9820011010'],
+      ['Meena Tailors', '9820011007'],
+    ];
+    let n = 0;
+    // Fill the first three days of daily seva, leaving later days open on purpose
+    days.slice(0, 3).forEach((date) => {
+      dailyTypes.forEach((type, i) => {
+        if ((i + n) % 3 === 2) return; // leave some slots needing a sponsor
+        const sp = sponsors[n % sponsors.length];
+        insSeva.run(type.id, date, sp[0], sp[1], [1100, 2100, 5100, 751][n % 4]);
+        n += 1;
+      });
+    });
+    onceTypes.forEach((type, i) => {
+      if (i % 3 === 2) return;
+      const sp = sponsors[(n + i) % sponsors.length];
+      insSeva.run(type.id, '', sp[0], sp[1], [11000, 21000, 5100][i % 3]);
+    });
+
     insAnn.run(
       'Maha Prasad on the last day',
       `Maha Prasad will be served on ${h.formatDate(lastDay)} from 12:00 PM. All families are requested to join.`,
@@ -169,6 +202,8 @@ function seed() {
   console.log('✅ Demo data added:');
   console.log(`   ${MEMBERS.length} members, ${DONORS.length} donations, ${EXPENSES.length} expenses`);
   console.log(`   programs and duties for ${days.length} days, 2 announcements`);
+  console.log(`   ${db.prepare('SELECT COUNT(*) AS c FROM sevas').get().c} seva sponsors across ${
+    db.prepare('SELECT COUNT(*) AS c FROM seva_types').get().c} seva types`);
   console.log('\n   Start the app with `npm start` and log in.');
 }
 

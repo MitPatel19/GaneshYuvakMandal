@@ -3,6 +3,7 @@ const express = require('express');
 const QRCode = require('qrcode');
 const { db } = require('../lib/db');
 const h = require('../lib/helpers');
+const { sevaTypeName } = require('../lib/seva-types');
 
 const router = express.Router();
 
@@ -56,6 +57,31 @@ router.get('/p', async (req, res) => {
           .all()
       : [];
 
+  // Seva sponsors, grouped by seva, as a public thank-you board.
+  let sevaGroups = [];
+  if (s.public_show_seva === '1') {
+    const rows = db
+      .prepare(
+        `SELECT s.donor_name, s.seva_date, t.id AS type_id, t.icon,
+                t.name, t.name_en, t.name_gu, t.name_hi, t.name_mr, t.sort_order
+           FROM sevas s JOIN seva_types t ON t.id = s.type_id
+          WHERE t.is_active = 1
+          ORDER BY t.sort_order, s.seva_date, s.id`
+      )
+      .all();
+    const map = new Map();
+    for (const r of rows) {
+      if (!map.has(r.type_id)) {
+        map.set(r.type_id, { icon: r.icon, label: sevaTypeName(r, res.locals.lang), sponsors: [] });
+      }
+      map.get(r.type_id).sponsors.push({
+        name: r.donor_name,
+        date: r.seva_date ? h.formatDate(r.seva_date) : '',
+      });
+    }
+    sevaGroups = [...map.values()];
+  }
+
   let qrDataUrl = '';
   if (s.upi_id) {
     try {
@@ -82,6 +108,7 @@ router.get('/p', async (req, res) => {
     aartis,
     totalCollected,
     topDonors,
+    sevaGroups,
     qrDataUrl,
     upiLink: s.upi_id
       ? h.upiLink({ upiId: s.upi_id, name: s.upi_name || s.mandal_name, note: 'Vargani' })

@@ -1,0 +1,120 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>⚙️ <%= t('seva_list') %></h1>
+    <div class="pagehead__sub"><%= types.length %> sevas · these are the rows that appear on every day</div>
+  </div>
+  <div class="pagehead__actions"><a class="btn btn--ghost" href="/seva">← <%= t('seva') %></a></div>
+</div>
+
+<details class="card">
+  <summary class="bold" style="cursor:pointer">➕ <%= t('add_new') %></summary>
+  <form method="post" action="/seva/types/new" class="mt-2">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="field">
+      <label for="nname"><%= t('name') %> *</label>
+      <input type="text" id="nname" name="name" required placeholder="e.g. મહાપ્રસાદ દાતા">
+    </div>
+    <div class="formgrid">
+      <div class="field">
+        <label for="nicon"><%= t('seva_icon') %></label>
+        <input type="text" id="nicon" name="icon" value="🙏" maxlength="8">
+      </div>
+      <div class="field">
+        <label for="namt"><%= t('seva_suggested') %> (<%= currency %>)</label>
+        <input type="number" id="namt" name="suggested_amount" min="0" step="1" inputmode="numeric">
+      </div>
+    </div>
+    <label class="check check--on">
+      <input type="checkbox" name="is_daily" value="1" checked>
+      <span><%= t('seva_daily') %> — needs a sponsor on each day (uncheck for <%= t('seva_once') %>)</span>
+    </label>
+    <details class="mt-1">
+      <summary class="small muted" style="cursor:pointer">🌐 Add other languages (optional)</summary>
+      <div class="formgrid mt-1">
+        <div class="field"><label for="ne">English</label><input type="text" id="ne" name="name_en"></div>
+        <div class="field"><label for="ng">ગુજરાતી</label><input type="text" id="ng" name="name_gu"></div>
+        <div class="field"><label for="nh">हिंदी</label><input type="text" id="nh" name="name_hi"></div>
+        <div class="field"><label for="nm">मराठी</label><input type="text" id="nm" name="name_mr"></div>
+      </div>
+    </details>
+    <button class="btn btn--primary btn--lg mt-1" type="submit">💾 <%= t('save') %></button>
+  </form>
+</details>
+
+<% types.forEach(function(ty, i){ %>
+  <div class="card" style="<%= ty.is_active ? '' : 'opacity:.6' %>">
+    <div class="flex-between mb-1">
+      <h3 class="mb-0"><%= ty.icon %> <%= ty.label %></h3>
+      <div class="flex">
+        <span class="badge <%= ty.is_daily ? 'badge--gold' : 'badge--info' %>">
+          <%= ty.is_daily ? t('seva_daily') : t('seva_once') %>
+        </span>
+        <% if (!ty.is_active) { %><span class="badge badge--out"><%= t('seva_hidden') %></span><% } %>
+        <% if (ty.used) { %><span class="badge"><%= ty.used %> <%= t('seva_sponsors') %></span><% } %>
+      </div>
+    </div>
+
+    <div class="flex mb-1 no-print">
+      <form method="post" action="/seva/types/<%= ty.id %>/move" style="margin:0" data-no-lock>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="dir" value="up">
+        <button class="btn btn--ghost btn--sm" type="submit" <%= i === 0 ? 'disabled' : '' %>>↑</button>
+      </form>
+      <form method="post" action="/seva/types/<%= ty.id %>/move" style="margin:0" data-no-lock>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="dir" value="down">
+        <button class="btn btn--ghost btn--sm" type="submit" <%= i === types.length - 1 ? 'disabled' : '' %>>↓</button>
+      </form>
+      <details style="flex:1">
+        <summary class="btn btn--ghost btn--sm" style="display:inline-flex"><%= t('edit') %></summary>
+        <form method="post" action="/seva/types/<%= ty.id %>/edit" class="mt-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="field">
+            <label for="n<%= ty.id %>"><%= t('name') %></label>
+            <input type="text" id="n<%= ty.id %>" name="name" value="<%= ty.name %>">
+          </div>
+          <div class="formgrid">
+            <div class="field">
+              <label for="i<%= ty.id %>"><%= t('seva_icon') %></label>
+              <input type="text" id="i<%= ty.id %>" name="icon" value="<%= ty.icon %>" maxlength="8">
+            </div>
+            <div class="field">
+              <label for="a<%= ty.id %>"><%= t('seva_suggested') %></label>
+              <input type="number" id="a<%= ty.id %>" name="suggested_amount"
+                     value="<%= ty.suggested_amount || '' %>" min="0" step="1" inputmode="numeric">
+            </div>
+          </div>
+          <div class="formgrid">
+            <div class="field"><label for="e<%= ty.id %>">English</label>
+              <input type="text" id="e<%= ty.id %>" name="name_en" value="<%= ty.name_en %>"></div>
+            <div class="field"><label for="g<%= ty.id %>">ગુજરાતી</label>
+              <input type="text" id="g<%= ty.id %>" name="name_gu" value="<%= ty.name_gu %>"></div>
+            <div class="field"><label for="hi<%= ty.id %>">हिंदी</label>
+              <input type="text" id="hi<%= ty.id %>" name="name_hi" value="<%= ty.name_hi %>"></div>
+            <div class="field"><label for="m<%= ty.id %>">मराठी</label>
+              <input type="text" id="m<%= ty.id %>" name="name_mr" value="<%= ty.name_mr %>"></div>
+          </div>
+          <label class="check <%= ty.is_daily ? 'check--on' : '' %>">
+            <input type="checkbox" name="is_daily" value="1" <%= ty.is_daily ? 'checked' : '' %>>
+            <span><%= t('seva_daily') %></span>
+          </label>
+          <label class="check <%= ty.is_active ? 'check--on' : '' %>">
+            <input type="checkbox" name="is_active" value="1" <%= ty.is_active ? 'checked' : '' %>>
+            <span>Show this seva</span>
+          </label>
+          <button class="btn btn--primary btn--sm" type="submit">💾 <%= t('save') %></button>
+        </form>
+      </details>
+      <form method="post" action="/seva/types/<%= ty.id %>/delete"
+            data-confirm="<%= ty.used ? 'This seva has sponsors. It will be hidden instead of deleted so their names are kept. Continue?' : t('confirm_delete') %>"
+            data-no-lock style="margin:0">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn--ghost btn--sm" type="submit">🗑</button>
+      </form>
+    </div>
+  </div>
+<% }); %>
+
+<%- include('../partials/footer') %>

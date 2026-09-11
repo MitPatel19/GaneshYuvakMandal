@@ -118,7 +118,13 @@ Your two important links:
    in Sthapana, morning and evening aarti for every day, Maha Prasad and
    Visarjan. Edit or delete anything you don't need.
 4. Go to **👥 Members** and add your committee.
-5. Go to **💬 WhatsApp**, choose the *Invitation* template and start sending.
+5. Go to **🍛 Seva** and check the sponsorship list under *Seva List* — morning
+   tea, prasad, thal, nasto, jamanvar, murti, water, gulal and shobhayatra
+   prasad are already there. Rename or add whatever your mandal uses, then start
+   filling in sponsors day by day.
+6. Go to **🔳 QR Code**, print the poster and paste it at the mandap so visitors
+   can scan for the program.
+7. Go to **💬 WhatsApp**, choose the *Invitation* template and start sending.
 
 > 💬 **Message language.** Templates are supplied in English, Gujarati, Hindi
 > and Marathi, and follow whichever language you pick with the 🌐 button. If you

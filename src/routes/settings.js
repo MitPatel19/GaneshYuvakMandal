@@ -12,7 +12,7 @@ const EDITABLE = [
   'mandal_name', 'tagline', 'year', 'festival_start', 'festival_end', 'address', 'about',
   'president_name', 'president_phone', 'secretary_name', 'secretary_phone',
   'treasurer_name', 'treasurer_phone', 'upi_id', 'upi_name', 'whatsapp_group_link',
-  'google_maps_link', 'language', 'currency', 'country_code',
+  'google_maps_link', 'language', 'currency', 'country_code', 'public_base_url',
 ];
 
 const TOGGLES = [
@@ -20,6 +20,7 @@ const TOGGLES = [
   'public_page_enabled',
   'public_show_donors',
   'public_show_total',
+  'public_show_seva',
 ];
 
 router.get('/', async (req, res) => {
@@ -126,8 +127,10 @@ router.post('/reset-season', (req, res) => {
     db.prepare('DELETE FROM events').run();
     db.prepare('DELETE FROM duties').run();
     db.prepare('DELETE FROM announcements').run();
+    // Sponsors are per-season; the seva list itself is kept for next year.
+    db.prepare('DELETE FROM sevas').run();
   })();
-  res.redirect('/settings?ok=' + encodeURIComponent('New season started — members, photos and settings kept'));
+  res.redirect('/settings?ok=' + encodeURIComponent('New season started — members, seva list, photos and settings kept'));
 });
 
 module.exports = router;

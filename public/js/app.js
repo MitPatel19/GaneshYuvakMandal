@@ -262,6 +262,22 @@
   });
 
   /* ---------------------------------------------------------------- */
+  /*  Seva form: pick a festival day with one tap                      */
+  /* ---------------------------------------------------------------- */
+
+  document.addEventListener('click', function (e) {
+    var chip = e.target.closest('[data-setdate]');
+    if (!chip) return;
+    e.preventDefault();
+    var input = document.getElementById('seva_date');
+    if (!input) return;
+    input.value = chip.getAttribute('data-setdate');
+    var all = document.querySelectorAll('[data-setdate]');
+    for (var i = 0; i < all.length; i++) all[i].classList.remove('chip--active');
+    chip.classList.add('chip--active');
+  });
+
+  /* ---------------------------------------------------------------- */
   /*  Instant client-side filter for long lists                        */
   /* ---------------------------------------------------------------- */
 

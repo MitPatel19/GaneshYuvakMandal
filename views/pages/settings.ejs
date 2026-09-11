@@ -130,6 +130,10 @@
       <input type="checkbox" name="public_show_total" value="1" <%= s.public_show_total === '1' ? 'checked' : '' %>>
       <span>Show total amount collected</span>
     </label>
+    <label class="check <%= s.public_show_seva === '1' ? 'check--on' : '' %>">
+      <input type="checkbox" name="public_show_seva" value="1" <%= s.public_show_seva === '1' ? 'checked' : '' %>>
+      <span>🍛 Show <%= t('seva') %> sponsors (prasad, thal, nasto …)</span>
+    </label>
 
     <div class="field mt-2">
       <label for="publicUrl">Your public link</label>
@@ -139,6 +143,17 @@
       <a class="btn btn--whatsapp" href="<%= publicShareLink %>" target="_blank" rel="noopener">💬 Share link</a>
       <button class="btn btn--ghost" type="button" data-copy="#publicUrl" data-copy-msg="<%= t('copied') %>">📋 <%= t('copy') %></button>
       <a class="btn btn--ghost" href="/p" target="_blank" rel="noopener">👁 <%= t('preview') %></a>
+    </div>
+
+    <div class="field mt-2">
+      <label for="public_base_url">Website address for printed QR posters</label>
+      <input type="url" id="public_base_url" name="public_base_url" value="<%= s.public_base_url %>"
+             placeholder="https://your-app.up.railway.app">
+      <div class="field__hint">
+        Leave empty to use whatever address you open the app on. Set it only when you attach
+        your own domain, so posters already printed keep working.
+        <a href="/qr">🔳 <%= t('qr_poster') %> →</a>
+      </div>
     </div>
 
     <div class="field mt-2">

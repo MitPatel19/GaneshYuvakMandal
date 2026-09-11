@@ -123,3 +123,42 @@ CREATE TABLE IF NOT EXISTS aartis (
   language   TEXT NOT NULL DEFAULT 'Marathi',
   sort_order INTEGER NOT NULL DEFAULT 0
 );
+
+-- ============================================================
+--  Seva / sponsorship: who is giving prasad, thal, nasto ...
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS seva_types (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  -- Fallback label, and optional per-language wording. The app shows
+  -- name_<lang> when it is filled in, otherwise `name`.
+  name       TEXT NOT NULL,
+  name_en    TEXT NOT NULL DEFAULT '',
+  name_gu    TEXT NOT NULL DEFAULT '',
+  name_hi    TEXT NOT NULL DEFAULT '',
+  name_mr    TEXT NOT NULL DEFAULT '',
+  icon       TEXT NOT NULL DEFAULT '🙏',
+  -- 1 = someone sponsors it on each day of the Mahotsav
+  -- 0 = sponsored once for the whole Mahotsav
+  is_daily   INTEGER NOT NULL DEFAULT 1,
+  suggested_amount REAL NOT NULL DEFAULT 0,
+  is_active  INTEGER NOT NULL DEFAULT 1,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS sevas (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  type_id    INTEGER NOT NULL REFERENCES seva_types(id),
+  -- Empty for a whole-Mahotsav seva, otherwise the day it covers.
+  seva_date  TEXT NOT NULL DEFAULT '',
+  donor_name TEXT NOT NULL,
+  phone      TEXT NOT NULL DEFAULT '',
+  address    TEXT NOT NULL DEFAULT '',
+  amount     REAL NOT NULL DEFAULT 0,
+  note       TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_sevas_date ON sevas(seva_date);
+CREATE INDEX IF NOT EXISTS idx_sevas_type ON sevas(type_id);
+CREATE INDEX IF NOT EXISTS idx_sevas_donor ON sevas(donor_name);

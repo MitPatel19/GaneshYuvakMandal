@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>📋 <%= t('seva_board') %></h1>
+    <div class="pagehead__sub"><%= filledSlots %>/<%= totalSlots %> <%= t('seva_filled') %></div>
+  </div>
+  <div class="pagehead__actions">
+    <button class="btn btn--ghost" type="button" data-print>🖨 <%= t('print') %></button>
+    <a class="btn btn--ghost" href="/seva">← <%= t('seva') %></a>
+  </div>
+</div>
+
+<div class="card card--flush">
+  <div class="tablewrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="position:sticky;left:0;background:var(--bg-alt);z-index:1"><%= t('seva') %></th>
+          <% festivalDays.forEach(function(d){ %>
+            <th class="nowrap <%= d === today ? 'bold' : '' %>">
+              <%= h.formatDate(d).replace(/ \d{4}$/, '') %>
+            </th>
+          <% }); %>
+        </tr>
+      </thead>
+      <tbody>
+        <% board.forEach(function(row){ %>
+          <tr>
+            <td style="position:sticky;left:0;background:var(--surface);min-width:190px">
+              <b><%= row.type.icon %> <%= row.label %></b>
+            </td>
+            <% row.cells.forEach(function(cell){ %>
+              <td style="min-width:130px">
+                <% if (cell.sponsors.length) { %>
+                  <% cell.sponsors.forEach(function(sp){ %>
+                    <a href="/seva/<%= sp.id %>/edit" style="display:block"><%= sp.donor_name %></a>
+                  <% }); %>
+                <% } else { %>
+                  <a class="faint" href="/seva/new?type=<%= row.type.id %>&date=<%= cell.date %>">＋</a>
+                <% } %>
+              </td>
+            <% }); %>
+          </tr>
+        <% }); %>
+        <% if (!board.length) { %>
+          <tr><td colspan="<%= festivalDays.length + 1 %>" class="muted"><%= t('none_yet') %></td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="field__hint">Tap ＋ in any empty box to add that day's sponsor.</p>
+
+<%- include('../partials/footer') %>

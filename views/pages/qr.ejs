@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead no-print">
+  <div>
+    <h1>🔳 <%= t('qr_poster') %></h1>
+    <div class="pagehead__sub"><%= t('qr_print_help') %></div>
+  </div>
+  <div class="pagehead__actions">
+    <button class="btn btn--primary" type="button" data-print>🖨 <%= t('print') %></button>
+    <a class="btn btn--ghost" href="/qr/code.png?size=1200">⬇ <%= t('qr_download') %></a>
+    <a class="btn btn--whatsapp" href="<%= shareLink %>" target="_blank" rel="noopener" data-share="#qrShare">
+      💬 <%= t('share') %>
+    </a>
+  </div>
+</div>
+<textarea id="qrShare" class="visually-hidden" readonly aria-hidden="true"><%= shareText %></textarea>
+
+<div class="qr-poster">
+  <div class="qr-poster__om" aria-hidden="true">🕉</div>
+  <div class="qr-poster__mandal"><%= settings.mandal_name %></div>
+  <div class="qr-poster__year">Ganesh Mahotsav <%= settings.year %></div>
+  <div class="qr-poster__dates">
+    <%= h.formatDate(settings.festival_start) %> — <%= h.formatDate(settings.festival_end) %>
+  </div>
+
+  <% if (qrDataUrl) { %>
+    <img class="qr-poster__code" src="<%= qrDataUrl %>" alt="QR code for <%= url %>">
+  <% } %>
+
+  <div class="qr-poster__scan">📱 <%= t('qr_scan_me') %></div>
+  <div class="qr-poster__url"><%= url %></div>
+
+  <% if (settings.address) { %>
+    <div class="qr-poster__addr">📍 <%= settings.address %></div>
+  <% } %>
+  <div class="qr-poster__morya">🙏 <%= tm('sm_bappa_morya') %> 🙏</div>
+</div>
+
+<div class="container-narrow no-print">
+  <div class="card">
+    <div class="field">
+      <label for="publicLink"><%= t('qr_link') %></label>
+      <input type="text" id="publicLink" value="<%= url %>" readonly>
+    </div>
+    <div class="btnrow">
+      <button class="btn btn--ghost" type="button" data-copy="#publicLink" data-copy-msg="<%= t('copied') %>">
+        📋 <%= t('copy') %>
+      </button>
+      <a class="btn btn--ghost" href="<%= url %>" target="_blank" rel="noopener">👁 <%= t('preview') %></a>
+    </div>
+    <p class="field__hint mt-1">
+      The QR points at whatever address you are using right now. If you later attach your own
+      domain, set it under <a href="/settings"><%= t('settings') %></a> → Public page → so printed
+      posters keep working.
+    </p>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,92 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <h1>🍛 <%= title %></h1>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/seva<%= backDate ? '?date=' + backDate : '' %>">← <%= t('back') %></a>
+  </div>
+</div>
+
+<form method="post" action="<%= action %>" class="container-narrow">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="card">
+    <div class="field">
+      <label for="type_id"><%= t('seva_which') %> *</label>
+      <select id="type_id" name="type_id" required autofocus>
+        <option value="">— <%= t('seva_which') %> —</option>
+        <% types.forEach(function(ty){ %>
+          <option value="<%= ty.id %>" <%= String(seva.type_id) === String(ty.id) ? 'selected' : '' %>>
+            <%= ty.icon %> <%= ty.label %><%= ty.is_daily ? '' : ' (' + t('seva_once') + ')' %>
+          </option>
+        <% }); %>
+      </select>
+      <div class="field__hint">Not in the list? Add it under <a href="/seva/types"><%= t('seva_list') %></a>.</div>
+    </div>
+
+    <div class="field">
+      <label for="donor_name"><%= t('seva_donor') %> *</label>
+      <input type="text" id="donor_name" name="donor_name" value="<%= seva.donor_name %>" required>
+    </div>
+
+    <div class="formgrid">
+      <div class="field">
+        <label for="phone"><%= t('phone') %></label>
+        <input type="tel" id="phone" name="phone" value="<%= seva.phone %>" inputmode="tel" placeholder="98765 43210">
+        <div class="field__hint">Needed to thank them on WhatsApp.</div>
+      </div>
+      <div class="field">
+        <label for="seva_date"><%= t('date') %></label>
+        <input type="date" id="seva_date" name="seva_date" value="<%= seva.seva_date %>">
+        <div class="field__hint">Ignored for a <%= t('seva_once') %> seva.</div>
+      </div>
+    </div>
+
+    <% if (festivalDays.length) { %>
+      <div class="field">
+        <div class="label"><%= t('seva_daily') %></div>
+        <div class="chips">
+          <% festivalDays.forEach(function(d){ %>
+            <button type="button" class="chip <%= seva.seva_date === d ? 'chip--active' : '' %>"
+                    data-setdate="<%= d %>"><%= h.formatDate(d).replace(/ \d{4}$/, '') %></button>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="field">
+      <label for="amount"><%= t('amount') %> (<%= currency %>)</label>
+      <input type="number" id="amount" name="amount" value="<%= seva.amount %>" min="0" step="1" inputmode="numeric">
+      <div class="field__hint">Leave empty if they are bringing the items themselves.</div>
+      <div class="chips">
+        <% quickAmounts.forEach(function(a){ %>
+          <button type="button" class="chip" data-amount="<%= a %>" data-amount-target="amount"><%= currency %><%= a %></button>
+        <% }); %>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="address"><%= t('address') %></label>
+      <input type="text" id="address" name="address" value="<%= seva.address %>">
+    </div>
+
+    <div class="field">
+      <label for="note"><%= t('note') %></label>
+      <textarea id="note" name="note" style="min-height:80px"><%= seva.note %></textarea>
+    </div>
+
+    <div class="btnrow mt-2">
+      <button class="btn btn--primary btn--lg" type="submit">💾 <%= t('save') %></button>
+      <a class="btn btn--ghost" href="/seva<%= backDate ? '?date=' + backDate : '' %>"><%= t('cancel') %></a>
+    </div>
+  </div>
+</form>
+
+<% if (seva.id) { %>
+  <form class="container-narrow" method="post" action="/seva/<%= seva.id %>/delete"
+        data-confirm="<%= t('confirm_delete') %>" data-no-lock>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="btn btn--danger btn--sm" type="submit">🗑 <%= t('delete') %></button>
+  </form>
+<% } %>
+
+<%- include('../partials/footer') %>

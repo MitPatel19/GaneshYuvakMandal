@@ -2,6 +2,7 @@
 const express = require('express');
 const { db, getBuiltinTemplate } = require('../lib/db');
 const h = require('../lib/helpers');
+const { sevaTypeName } = require('../lib/seva-types');
 
 const router = express.Router();
 
@@ -34,6 +35,20 @@ router.get('/', (req, res) => {
     .prepare('SELECT * FROM announcements ORDER BY pinned DESC, id DESC LIMIT 3')
     .all();
 
+  // Who is giving prasad / thal / nasto today
+  const todaySeva = db
+    .prepare(
+      `SELECT s.*, t.icon, t.name, t.name_en, t.name_gu, t.name_hi, t.name_mr
+         FROM sevas s JOIN seva_types t ON t.id = s.type_id
+        WHERE s.seva_date = ?
+        ORDER BY t.sort_order, s.id`
+    )
+    .all(today)
+    .map((r) => ({ ...r, label: sevaTypeName(r, res.locals.lang) }));
+
+  const sevaTotal = db.prepare('SELECT COALESCE(SUM(amount),0) AS t FROM sevas').get().t;
+  const sevaCount = db.prepare('SELECT COUNT(*) AS c FROM sevas').get().c;
+
   const todayCollected = db
     .prepare('SELECT COALESCE(SUM(amount), 0) AS total FROM donations WHERE donated_on = ?')
     .get(today).total;
@@ -59,6 +74,9 @@ router.get('/', (req, res) => {
     todayEvents,
     upcomingEvents,
     todayDuties,
+    todaySeva,
+    sevaTotal,
+    sevaCount,
     recentDonations,
     pinned,
     inviteText,

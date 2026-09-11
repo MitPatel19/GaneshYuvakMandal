@@ -2,10 +2,11 @@
 const express = require('express');
 const { db } = require('../lib/db');
 const h = require('../lib/helpers');
+const { sevaTypeName } = require('../lib/seva-types');
 
 const router = express.Router();
 
-function buildReport(settings) {
+function buildReport(settings, lang) {
   const collected = db.prepare('SELECT COALESCE(SUM(amount),0) AS t FROM donations').get().t;
   const spent = db.prepare('SELECT COALESCE(SUM(amount),0) AS t FROM expenses').get().t;
 
@@ -44,12 +45,29 @@ function buildReport(settings) {
     )
     .all();
 
+  const sevaTotal = db.prepare('SELECT COALESCE(SUM(amount),0) AS t FROM sevas').get().t;
+  const sevaByType = db
+    .prepare(
+      `SELECT t.icon, t.name, t.name_en, t.name_gu, t.name_hi, t.name_mr,
+              COUNT(s.id) AS count, COALESCE(SUM(s.amount),0) AS total
+         FROM sevas s JOIN seva_types t ON t.id = s.type_id
+        GROUP BY t.id ORDER BY total DESC, count DESC`
+    )
+    .all();
+  const topSevaDonors = db
+    .prepare(
+      `SELECT donor_name, phone, COUNT(*) AS times, COALESCE(SUM(amount),0) AS total
+         FROM sevas GROUP BY donor_name, phone ORDER BY total DESC, times DESC LIMIT 15`
+    )
+    .all();
+
   const counts = {
     donations: db.prepare('SELECT COUNT(*) AS c FROM donations').get().c,
     expenses: db.prepare('SELECT COUNT(*) AS c FROM expenses').get().c,
     members: db.prepare('SELECT COUNT(*) AS c FROM members WHERE is_active = 1').get().c,
     events: db.prepare('SELECT COUNT(*) AS c FROM events').get().c,
     photos: db.prepare('SELECT COUNT(*) AS c FROM photos').get().c,
+    seva: db.prepare('SELECT COUNT(*) AS c FROM sevas').get().c,
   };
 
   const currency = settings.currency || '₹';
@@ -57,8 +75,10 @@ function buildReport(settings) {
   const maxCategory = byCategory.reduce((m, d) => Math.max(m, d.total), 0);
 
   return {
+    sevaByType: sevaByType.map((r) => ({ ...r, label: sevaTypeName(r, lang) })),
     collected, spent, inHand: collected - spent,
     byMode, byPurpose, byCategory, daily, topDonors, counts,
+    sevaTotal, topSevaDonors,
     currency, maxDaily, maxCategory,
   };
 }
@@ -74,6 +94,8 @@ router.get('/', (req, res) => {
     `💰 ${tm('sm_total_collected')}: ${h.formatMoney(report.collected, s.currency)}`,
     `🧾 ${tm('sm_total_spent')}: ${h.formatMoney(report.spent, s.currency)}`,
     `🏦 ${tm('sm_balance')}: ${h.formatMoney(report.inHand, s.currency)}`,
+    '',
+    `🍛 ${tm('seva_total')}: ${h.formatMoney(report.sevaTotal, s.currency)}  (${report.counts.seva} ${tm('seva_sponsors')})`,
     '',
     `👥 ${tm('sm_donors')}: ${report.counts.donations}   |   ${tm('sm_members_c')}: ${report.counts.members}`,
     '',
@@ -97,7 +119,7 @@ router.get('/print', (req, res) => {
   const s = res.locals.settings;
   const donations = db.prepare('SELECT * FROM donations ORDER BY donated_on, id').all();
   const expenses = db.prepare('SELECT * FROM expenses ORDER BY spent_on, id').all();
-  const report = buildReport(s);
+  const report = buildReport(s, res.locals.lang);
   res.render('pages/report-print', {
     title: 'Hisab / Accounts',
     donations,
@@ -118,6 +140,8 @@ router.get('/backup.json', (req, res) => {
     events: db.prepare('SELECT * FROM events').all(),
     duties: db.prepare('SELECT * FROM duties').all(),
     announcements: db.prepare('SELECT * FROM announcements').all(),
+    seva_types: db.prepare('SELECT * FROM seva_types').all(),
+    sevas: db.prepare('SELECT * FROM sevas').all(),
     templates: db.prepare('SELECT * FROM templates').all(),
     aartis: db.prepare('SELECT * FROM aartis').all(),
     photos: db.prepare('SELECT * FROM photos').all(),

@@ -145,6 +145,25 @@
     </div>
   <% } %>
 
+  <% if (sevaGroups.length) { %>
+    <div class="card card--flush">
+      <div class="card__head"><h2>🍛 <%= t('seva') %></h2></div>
+      <ul class="list">
+        <% sevaGroups.forEach(function(g){ %>
+          <li class="list__item">
+            <span class="avatar" aria-hidden="true" style="background:var(--bg-alt);font-size:1.2rem"><%= g.icon %></span>
+            <div class="list__main">
+              <div class="list__title"><%= g.label %></div>
+              <% g.sponsors.forEach(function(sp){ %>
+                <div class="list__meta">🙏 <b><%= sp.name %></b><% if (sp.date) { %> · <%= sp.date %><% } %></div>
+              <% }); %>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } %>
+
   <% if (topDonors.length) { %>
     <div class="card card--flush">
       <div class="card__head"><h2>🙏 Thank you to our donors</h2></div>

@@ -100,6 +100,48 @@
   <% } else { %><p class="muted"><%= t('none_yet') %></p><% } %>
 </div>
 
+<div class="card">
+  <h3>🍛 <%= t('seva') %> — <%= h.formatMoney(r.sevaTotal, currency) %> · <%= r.counts.seva %> <%= t('seva_sponsors') %></h3>
+  <p class="field__hint mb-2">
+    Seva is counted separately from donations so nothing is added twice. Add a seva as a
+    donation too if the cash actually came into the mandal fund.
+  </p>
+  <% if (r.sevaByType.length) { %>
+    <div class="tablewrap">
+      <table class="data" style="min-width:0">
+        <thead><tr><th><%= t('seva') %></th><th class="num"><%= t('seva_sponsors') %></th><th class="num"><%= t('total') %></th></tr></thead>
+        <tbody>
+          <% r.sevaByType.forEach(function(sv){ %>
+            <tr>
+              <td><%= sv.icon %> <%= sv.label %></td>
+              <td class="num"><%= sv.count %></td>
+              <td class="num money-in"><%= h.formatMoney(sv.total, currency) %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %><p class="muted"><%= t('none_yet') %></p><% } %>
+</div>
+
+<% if (r.topSevaDonors.length) { %>
+  <div class="card card--flush">
+    <div class="card__head"><h2>🙏 Top <%= t('seva') %> <%= t('seva_sponsors') %></h2></div>
+    <ul class="list">
+      <% r.topSevaDonors.forEach(function(d, i){ %>
+        <li class="list__item">
+          <span class="avatar" aria-hidden="true"><%= i + 1 %></span>
+          <div class="list__main">
+            <div class="list__title"><%= d.donor_name %></div>
+            <div class="list__meta"><%= d.times %> seva<% if (d.phone) { %> · 📞 <%= d.phone %><% } %></div>
+          </div>
+          <div class="list__side money-in big"><%= h.formatMoney(d.total, currency) %></div>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>
+
 <div class="card card--flush">
   <div class="card__head"><h2>🏆 Top donors</h2></div>
   <% if (r.topDonors.length) { %>
@@ -126,6 +168,7 @@
     <a class="btn btn--ghost" href="/donations/export.csv">💰 Donations CSV</a>
     <a class="btn btn--ghost" href="/expenses/export.csv">🧾 Expenses CSV</a>
     <a class="btn btn--ghost" href="/members/export.csv">👥 Members CSV</a>
+    <a class="btn btn--ghost" href="/seva/export.csv">🍛 Seva CSV</a>
     <a class="btn btn--ghost" href="/reports/backup.json">💾 Full backup (JSON)</a>
   </div>
   <p class="field__hint mt-1">Take a backup at the end of the Mahotsav and keep it safely.</p>

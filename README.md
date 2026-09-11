@@ -45,6 +45,24 @@ gets a **printable receipt** with the amount in words and your UPI QR code —
 and a **Send Receipt** button that opens WhatsApp with a thank-you already
 written.
 
+### 🍛 Seva — who is giving prasad, thal and nasto
+A second kind of giving, separate from cash donations: the daily sponsorships a
+mandal actually runs on. Ships with the full list — morning tea & breakfast,
+morning prasad, afternoon thal, 4 PM fruit, evening prasad, evening thal, night
+snacks, tea — plus the one-off ones: first and last day jamanvar, murti, water,
+gulal, and shobhayatra prasad for both days. Rename, reorder, hide or add your
+own; each can carry names in all four languages.
+
+- **Per day.** Pick a date and see every seva for that day with its sponsor, or
+  a clear *Still needs a sponsor* flag. Whole-Mahotsav sevas sit in their own
+  section and never ask for a date.
+- **Seva Board** shows the whole festival as one grid — every seva down the
+  side, every day across the top. Tap any empty box to fill it. Prints on one
+  page for the notice board.
+- Optional amount per sponsor (leave it blank when they bring the items
+  themselves), WhatsApp thank-you per sponsor, a shareable day list, CSV export,
+  and a public thank-you board.
+
 ### 🧾 Expenses & accounts
 Categorised expenses (Murti, Mandap, Decoration, Sound, Prasad, Visarjan …)
 with vendor and who paid. The **Reports** page shows collected vs spent vs
@@ -70,6 +88,13 @@ Sukhkarta Dukhharta, Jai Ganesh Deva, Ganpati Atharvashirsha and Shendur Laal
 Chadhayo are included, with a big **A− / A+** control so people can actually
 read the lyrics while singing. Add your own aartis too.
 
+### 🔳 QR code poster
+A printable poster for your public link: mandal name, dates, a large QR and
+*Scan for our full program*. Print it for the mandap, download the bare QR as a
+PNG to send as a WhatsApp image, or share the link straight from the page. It
+follows whatever address you are on, so it is correct on Railway with no setup —
+set a fixed address in Settings once you attach your own domain.
+
 ### 👥 Members · 📸 Gallery · 📢 Announcements
 Committee directory with WhatsApp and call buttons, a photo gallery that also
 feeds the public page, and pinned announcements that show on the home screen.
@@ -87,6 +112,7 @@ records while keeping members, photos, templates and settings.
 |---|---|
 | **Large default text** | 17px base with an **A− / A+** control saved per device |
 | **Big tap targets** | Every button is at least 50px tall |
+| **Seva in your words** | The prasad/thal/nasto list ships in Gujarati, English, Hindi and Marathi — rename anything |
 | **Four languages** | English · ગુજરાતી · हिंदी · मराठी, switchable from the header — screens *and* WhatsApp messages |
 | **Works one-handed** | Bottom navigation on phones, sidebar on desktop |
 | **Installable** | Add to Home Screen on Android and iPhone; opens like an app |
@@ -162,6 +188,7 @@ src/
     helpers.js         Dates, money, phone/WhatsApp links, templates, CSV
     i18n.js            English / Gujarati / Hindi / Marathi dictionary
     templates.js       Built-in WhatsApp templates in all four languages
+    seva-types.js      The default seva (sponsorship) list, in all four languages
   routes/              One file per section of the app
 views/
   partials/            Shared header and footer

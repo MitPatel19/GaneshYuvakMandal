@@ -1,0 +1,145 @@
+<%- include('../partials/header') %>
+
+<div class="pagehead">
+  <div>
+    <h1>🍛 <%= t('seva') %></h1>
+    <div class="pagehead__sub">
+      <%= h.formatDateLong(date) %> · <%= filled %>/<%= dailyCount %> <%= t('seva_filled') %>
+    </div>
+  </div>
+  <div class="pagehead__actions">
+    <a class="btn btn--ghost" href="/seva/board">📋 <%= t('seva_board') %></a>
+    <a class="btn btn--ghost" href="/seva/types">⚙️ <%= t('seva_list') %></a>
+    <a class="btn btn--primary" href="/seva/new?date=<%= date %>">➕ <%= t('seva_add') %></a>
+  </div>
+</div>
+
+<div class="grid grid--3 mb-2">
+  <div class="stat stat--count">
+    <div class="stat__label">🍛 <%= t('seva_filled') %></div>
+    <div class="stat__value"><%= filled %> / <%= dailyCount %></div>
+    <div class="stat__hint"><%= h.formatDate(date) %></div>
+  </div>
+  <div class="stat stat--in">
+    <div class="stat__label">🙏 <%= t('seva_sponsors') %></div>
+    <div class="stat__value"><%= sponsorCount %></div>
+    <div class="stat__hint"><%= t('total') %></div>
+  </div>
+  <div class="stat stat--hand">
+    <div class="stat__label">💰 <%= t('seva_total') %></div>
+    <div class="stat__value"><%= h.formatMoney(grandTotal, currency) %></div>
+    <div class="stat__hint"><%= t('today') %>: <%= h.formatMoney(dayTotal, currency) %></div>
+  </div>
+</div>
+
+<div class="card">
+  <form method="get" action="/seva" class="searchbar mb-0" data-no-lock>
+    <input type="date" name="date" value="<%= date %>" aria-label="<%= t('date') %>">
+    <button class="btn btn--ghost" type="submit">📆 <%= t('search') %></button>
+    <a class="btn btn--whatsapp" href="<%= shareLink %>" target="_blank" rel="noopener" data-share="#sevaShare">
+      💬 <%= t('share') %>
+    </a>
+  </form>
+  <% if (festivalDays.length) { %>
+    <div class="chips mt-1">
+      <% festivalDays.forEach(function(d){ %>
+        <a class="chip <%= d === date ? 'chip--active' : '' %>" href="/seva?date=<%= d %>">
+          <%= h.formatDate(d).replace(/ \d{4}$/, '') %>
+        </a>
+      <% }); %>
+    </div>
+  <% } %>
+</div>
+<textarea id="sevaShare" class="visually-hidden" readonly aria-hidden="true"><%= shareText %></textarea>
+
+<!-- Daily sevas for the chosen day -->
+<div class="card card--flush">
+  <div class="card__head">
+    <h2>🍽 <%= t('seva_daily') %> — <%= h.formatDate(date) %></h2>
+  </div>
+  <% if (dailyRows.length) { %>
+    <ul class="list">
+      <% dailyRows.forEach(function(row){ %>
+        <li class="list__item">
+          <span class="avatar" aria-hidden="true" style="background:var(--bg-alt);font-size:1.3rem"><%= row.type.icon %></span>
+          <div class="list__main">
+            <div class="list__title"><%= row.label %></div>
+            <% if (row.sponsors.length) { %>
+              <% row.sponsors.forEach(function(sp){ %>
+                <div class="list__meta">
+                  🙏 <b><%= sp.donor_name %></b>
+                  <% if (sp.amount > 0) { %> · <span class="money-in"><%= h.formatMoney(sp.amount, currency) %></span><% } %>
+                  <% if (sp.phone) { %> · 📞 <%= sp.phone %><% } %>
+                  <% if (sp.note) { %> · <%= sp.note %><% } %>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="list__meta"><span class="badge badge--out"><%= t('seva_open') %></span></div>
+            <% } %>
+          </div>
+          <div class="list__actions">
+            <% row.sponsors.forEach(function(sp){ %>
+              <% if (sp.phone) { %>
+                <a class="btn btn--whatsapp btn--sm"
+                   href="<%= h.whatsappLink(sp.phone, '🙏 ' + settings.mandal_name + '\n\n' + row.label + ' — ' + h.formatDate(date) + '\n\n', settings.country_code) %>"
+                   target="_blank" rel="noopener" title="<%= t('seva_thank') %>">💬</a>
+              <% } %>
+              <a class="btn btn--ghost btn--sm" href="/seva/<%= sp.id %>/edit"><%= t('edit') %></a>
+            <% }); %>
+            <a class="btn <%= row.sponsors.length ? 'btn--ghost' : 'btn--saffron' %> btn--sm"
+               href="/seva/new?type=<%= row.type.id %>&date=<%= date %>">➕</a>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  <% } else { %>
+    <div class="empty">
+      <div class="empty__ic">🍛</div>
+      <p><%= t('none_yet') %></p>
+      <a class="btn btn--primary btn--sm" href="/seva/types">⚙️ <%= t('seva_list') %></a>
+    </div>
+  <% } %>
+</div>
+
+<!-- Whole-Mahotsav sevas -->
+<% if (onceRows.length) { %>
+  <div class="card card--flush">
+    <div class="card__head">
+      <h2>🕉 <%= t('seva_once') %></h2>
+    </div>
+    <ul class="list">
+      <% onceRows.forEach(function(row){ %>
+        <li class="list__item">
+          <span class="avatar" aria-hidden="true" style="background:var(--bg-alt);font-size:1.3rem"><%= row.type.icon %></span>
+          <div class="list__main">
+            <div class="list__title"><%= row.label %></div>
+            <% if (row.sponsors.length) { %>
+              <% row.sponsors.forEach(function(sp){ %>
+                <div class="list__meta">
+                  🙏 <b><%= sp.donor_name %></b>
+                  <% if (sp.amount > 0) { %> · <span class="money-in"><%= h.formatMoney(sp.amount, currency) %></span><% } %>
+                  <% if (sp.phone) { %> · 📞 <%= sp.phone %><% } %>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="list__meta"><span class="badge badge--out"><%= t('seva_open') %></span></div>
+            <% } %>
+          </div>
+          <div class="list__actions">
+            <% row.sponsors.forEach(function(sp){ %>
+              <a class="btn btn--ghost btn--sm" href="/seva/<%= sp.id %>/edit"><%= t('edit') %></a>
+            <% }); %>
+            <a class="btn <%= row.sponsors.length ? 'btn--ghost' : 'btn--saffron' %> btn--sm"
+               href="/seva/new?type=<%= row.type.id %>">➕</a>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>
+
+<div class="btnrow">
+  <a class="btn btn--ghost" href="/seva/export.csv">⬇ CSV</a>
+</div>
+
+<%- include('../partials/footer') %>

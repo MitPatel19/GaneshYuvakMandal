@@ -5,6 +5,7 @@ const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const config = require('./config');
 const { BUILTIN_TEMPLATES, LEGACY_NAME_TO_KEY } = require('./templates');
+const { DEFAULT_SEVA_TYPES } = require('./seva-types');
 const { LANGUAGES } = require('./i18n');
 
 const db = new Database(config.dbFile);
@@ -41,9 +42,13 @@ const DEFAULT_SETTINGS = {
   // When on, WhatsApp templates are shown in whichever language is picked with
   // the 🌐 button. When off, they always use the default language above.
   template_follow_ui_language: '1',
+  // Leave empty to use whatever address the site is opened on. Set it once a
+  // custom domain is attached so printed QR posters keep pointing at the right place.
+  public_base_url: '',
   public_page_enabled: '1',
   public_show_donors: '1',
   public_show_total: '0',
+  public_show_seva: '1',
 };
 
 const getSettingStmt = db.prepare('SELECT value FROM settings WHERE key = ?');
@@ -231,6 +236,19 @@ function seedFirstRun() {
   }
 
   syncBuiltinTemplates();
+
+  const sevaTypeCount = db.prepare('SELECT COUNT(*) AS c FROM seva_types').get().c;
+  if (sevaTypeCount === 0) {
+    const ins = db.prepare(
+      `INSERT INTO seva_types (name, name_en, name_gu, name_hi, name_mr, icon, is_daily, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+    db.transaction(() => {
+      DEFAULT_SEVA_TYPES.forEach((t, i) => {
+        ins.run(t.gu, t.en, t.gu, t.hi, t.mr, t.icon, t.is_daily, i + 1);
+      });
+    })();
+  }
 
   const aartiCount = db.prepare('SELECT COUNT(*) AS c FROM aartis').get().c;
   if (aartiCount === 0) {
