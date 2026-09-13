@@ -8,7 +8,7 @@ const config = require('./lib/config');
 const { allSettings } = require('./lib/db');
 const helpers = require('./lib/helpers');
 const { LANGUAGES, translator } = require('./lib/i18n');
-const { loadUser, requireLogin } = require('./lib/auth');
+const { loadUser, requireLogin, requireOwner, isOwner } = require('./lib/auth');
 
 const app = express();
 app.set('trust proxy', 1); // Railway terminates TLS in front of us
@@ -93,6 +93,7 @@ app.use((req, res, next) => {
   res.locals.t = translator(lang);
   res.locals.h = helpers;
   res.locals.user = req.user;
+  res.locals.isOwner = isOwner(req.user);
   res.locals.currency = settings.currency || '₹';
   res.locals.today = helpers.todayISO();
   res.locals.templateLang = helpers.templateLanguage(settings, lang);
@@ -120,8 +121,9 @@ app.use((req, res, next) => {
     { href: '/aarti',         icon: '📖', label: t('aarti') },
     { href: '/reports',       icon: '📊', label: t('reports') },
     { href: '/qr',            icon: '🔳', label: t('qr_poster') },
-    { href: '/settings',      icon: '⚙️', label: t('settings') },
-  ];
+    { href: '/account',       icon: '🔑', label: t('my_account') },
+    { href: '/settings',      icon: '⚙️', label: t('settings'), ownerOnly: true },
+  ].filter((item) => !item.ownerOnly || res.locals.isOwner);
   res.locals.isActive = (href) =>
     req.path === href || req.path.indexOf(href + '/') === 0;
   res.locals.countdown = (() => {
@@ -158,7 +160,8 @@ app.use('/gallery', requireLogin, require('./routes/gallery'));
 app.use('/aarti', requireLogin, require('./routes/aarti'));
 app.use('/reports', requireLogin, require('./routes/reports'));
 app.use('/qr', requireLogin, require('./routes/qr'));
-app.use('/settings', requireLogin, require('./routes/settings'));
+app.use('/account', requireLogin, require('./routes/account'));
+app.use('/settings', requireLogin, requireOwner, require('./routes/settings'));
 
 /* ------------------------------------------------------------------ */
 /*  404 + error handling                                               */

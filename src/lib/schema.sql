@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
   username      TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   display_name  TEXT NOT NULL DEFAULT '',
-  role          TEXT NOT NULL DEFAULT 'admin',
+  -- 'owner' = main admin (everything), 'helper' = login created by the owner
+  role          TEXT NOT NULL DEFAULT 'helper',
   created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

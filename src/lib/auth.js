@@ -69,6 +69,20 @@ function loadUser(req, _res, next) {
 }
 
 /** Gate for every admin page. Remembers where the user was headed. */
+/**
+ * Two roles, deliberately kept simple:
+ *   owner  — the main admin: everything, including donations, settings and
+ *            creating logins for everyone else.
+ *   helper — a login the owner creates: runs the Mahotsav day to day, but
+ *            cannot record donations, change settings, or create logins.
+ */
+const ROLE_OWNER = 'owner';
+const ROLE_HELPER = 'helper';
+
+function isOwner(user) {
+  return Boolean(user) && user.role === ROLE_OWNER;
+}
+
 function requireLogin(req, res, next) {
   if (req.user) return next();
   if (req.method === 'GET' && req.accepts('html')) {
@@ -78,7 +92,23 @@ function requireLogin(req, res, next) {
   return res.status(401).send('Login required');
 }
 
+/** Gate for anything only the main admin may do. */
+function requireOwner(req, res, next) {
+  if (!req.user) return requireLogin(req, res, next);
+  if (isOwner(req.user)) return next();
+  return res.status(403).render('pages/error', {
+    title: 'Only the main admin can do this',
+    message:
+      'This part of the app is kept for the main admin. Please ask them if you need a change here.',
+    status: 403,
+  });
+}
+
 module.exports = {
+  ROLE_OWNER,
+  ROLE_HELPER,
+  isOwner,
+  requireOwner,
   verifyUser,
   setPassword,
   loadUser,

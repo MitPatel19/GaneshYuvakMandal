@@ -211,6 +211,8 @@
 
 <div class="card">
   <h3>🔐 <%= t('change_password') %></h3>
+  <p class="field__hint mb-2">This changes <b>your own</b> password. Everyone can also do
+    this from <a href="/account">🔑 <%= t('my_account') %></a>.</p>
   <form method="post" action="/settings/password">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="formgrid">
@@ -228,8 +230,13 @@
 </div>
 
 <div class="card">
-  <h3>👤 Extra logins</h3>
-  <p class="field__hint mb-2">Give the treasurer or secretary their own login instead of sharing one password.</p>
+  <h3>👤 <%= t('logins') %></h3>
+  <p class="field__hint mb-2">
+    Give each committee member their own login instead of sharing one password.
+    A <b><%= t('role_helper') %></b> can run the Mahotsav day to day but cannot record
+    donations, change these settings, or create logins. A <b><%= t('role_owner') %></b>
+    can do everything you can.
+  </p>
   <form method="post" action="/settings/users/new">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="formgrid">
@@ -242,9 +249,18 @@
         <input type="text" id="nd" name="display_name">
       </div>
     </div>
-    <div class="field">
-      <label for="np"><%= t('password') %></label>
-      <input type="password" id="np" name="password" minlength="6" autocomplete="new-password" required>
+    <div class="formgrid">
+      <div class="field">
+        <label for="np"><%= t('password') %></label>
+        <input type="password" id="np" name="password" minlength="6" autocomplete="new-password" required>
+      </div>
+      <div class="field">
+        <label for="nrole"><%= t('role') %></label>
+        <select id="nrole" name="role">
+          <option value="helper"><%= t('role_helper') %> — <%= t('read_only') %> for donations &amp; settings</option>
+          <option value="owner"><%= t('role_owner') %> — can change everything</option>
+        </select>
+      </div>
     </div>
     <button class="btn btn--ghost" type="submit">➕ <%= t('add') %></button>
   </form>
@@ -256,16 +272,43 @@
         <li class="list__item" style="padding-left:0;padding-right:0">
           <span class="avatar" aria-hidden="true"><%= h.initials(u.display_name || u.username) %></span>
           <div class="list__main">
-            <div class="list__title"><%= u.username %><%= u.id === user.id ? ' (you)' : '' %></div>
+            <div class="list__title">
+              <%= u.username %><%= u.id === user.id ? ' (you)' : '' %>
+              <span class="badge <%= u.role === 'owner' ? 'badge--gold' : 'badge--info' %>">
+                <%= u.role === 'owner' ? t('role_owner') : t('role_helper') %>
+              </span>
+            </div>
             <div class="list__meta"><%= u.display_name || '—' %></div>
+            <% if (u.id !== user.id) { %>
+              <details class="mt-1">
+                <summary class="small muted" style="cursor:pointer">🔑 <%= t('reset_password') %></summary>
+                <form method="post" action="/settings/users/<%= u.id %>/password" class="flex mt-1">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="password" name="new_password" minlength="6" required
+                         placeholder="<%= t('new_password') %>" autocomplete="new-password"
+                         style="flex:1 1 160px;min-width:0">
+                  <button class="btn btn--ghost btn--sm" type="submit"><%= t('save') %></button>
+                </form>
+              </details>
+            <% } %>
           </div>
-          <% if (u.id !== user.id && users.length > 1) { %>
-            <form method="post" action="/settings/users/<%= u.id %>/delete"
-                  data-confirm="<%= t('confirm_delete') %>" data-no-lock style="margin:0">
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button class="btn btn--ghost btn--sm" type="submit">🗑</button>
-            </form>
-          <% } %>
+          <div class="list__actions">
+            <% if (u.id !== user.id) { %>
+              <form method="post" action="/settings/users/<%= u.id %>/role" style="margin:0" data-no-lock>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="role" value="<%= u.role === 'owner' ? 'helper' : 'owner' %>">
+                <button class="btn btn--ghost btn--sm" type="submit"
+                        data-confirm-link="Change <%= u.username %> to <%= u.role === 'owner' ? t('role_helper') : t('role_owner') %>?">
+                  <%= u.role === 'owner' ? '↓ ' + t('role_helper') : '↑ ' + t('role_owner') %>
+                </button>
+              </form>
+              <form method="post" action="/settings/users/<%= u.id %>/delete"
+                    data-confirm="<%= t('confirm_delete') %>" data-no-lock style="margin:0">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn--ghost btn--sm" type="submit">🗑</button>
+              </form>
+            <% } %>
+          </div>
         </li>
       <% }); %>
     </ul>

@@ -196,6 +196,26 @@ function migrate() {
     "CREATE UNIQUE INDEX IF NOT EXISTS idx_templates_builtin " +
       "ON templates(builtin_key, lang) WHERE builtin_key <> ''"
   );
+
+  // v3 -> v4: logins gained roles. Everyone used to be a full admin, so the
+  // first login created (the one seeded from ADMIN_USERNAME) becomes the owner
+  // and any extra logins become helpers. Nobody is locked out — the owner can
+  // promote anyone back from Settings.
+  const legacy = db.prepare("SELECT COUNT(*) AS c FROM users WHERE role = 'admin'").get().c;
+  if (legacy > 0) {
+    const first = db.prepare('SELECT id FROM users ORDER BY id LIMIT 1').get();
+    db.transaction(() => {
+      db.prepare("UPDATE users SET role = 'helper' WHERE role = 'admin'").run();
+      if (first) db.prepare("UPDATE users SET role = 'owner' WHERE id = ?").run(first.id);
+    })();
+  }
+
+  // A database must never end up with no owner — that would lock Settings for good.
+  const owners = db.prepare("SELECT COUNT(*) AS c FROM users WHERE role = 'owner'").get().c;
+  if (owners === 0) {
+    const first = db.prepare('SELECT id FROM users ORDER BY id LIMIT 1').get();
+    if (first) db.prepare("UPDATE users SET role = 'owner' WHERE id = ?").run(first.id);
+  }
 }
 
 /**
@@ -230,8 +250,8 @@ function seedFirstRun() {
     ).run(
       config.admin.username.toLowerCase(),
       bcrypt.hashSync(config.admin.password, 10),
-      'Administrator',
-      'admin'
+      'Main Admin',
+      'owner'
     );
   }
 

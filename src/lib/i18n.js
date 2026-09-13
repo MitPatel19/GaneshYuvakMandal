@@ -190,6 +190,16 @@ const en = {
   qr_print_help: 'Print this and paste it at the mandap, or send the QR image on WhatsApp.',
   qr_download: 'Download QR image',
   qr_link: 'Your public link',
+  my_account: 'My Account',
+  role_owner: 'Main Admin',
+  role_helper: 'Helper',
+  role: 'Role',
+  logins: 'Logins',
+  role_owner_can: 'You are the main admin — you can change everything, including donations, settings and logins.',
+  role_helper_can: 'You can manage the Mahotsav day to day. Recording donations, changing settings and creating logins are kept for the main admin.',
+  reset_password: 'Reset password',
+  owner_only: 'Main admin only',
+  read_only: 'View only',
 };
 
 const gu = {
@@ -370,6 +380,16 @@ const gu = {
   qr_print_help: 'આ પ્રિન્ટ કરીને મંડપ પર લગાવો, અથવા QR ઈમેજ વોટ્સએપ પર મોકલો.',
   qr_download: 'QR ઈમેજ ડાઉનલોડ',
   qr_link: 'તમારી જાહેર લિંક',
+  my_account: 'મારું ખાતું',
+  role_owner: 'મુખ્ય એડમિન',
+  role_helper: 'સહાયક',
+  role: 'ભૂમિકા',
+  logins: 'લોગિન',
+  role_owner_can: 'તમે મુખ્ય એડમિન છો — તમે ફાળો, સેટિંગ અને લોગિન સહિત બધું બદલી શકો છો.',
+  role_helper_can: 'તમે મહોત્સવનું રોજિંદું કામ સંભાળી શકો છો. ફાળો નોંધવો, સેટિંગ બદલવી અને લોગિન બનાવવા મુખ્ય એડમિન માટે રાખેલ છે.',
+  reset_password: 'પાસવર્ડ રીસેટ',
+  owner_only: 'ફક્ત મુખ્ય એડમિન',
+  read_only: 'ફક્ત જોવા માટે',
 };
 
 const hi = {
@@ -550,6 +570,16 @@ const hi = {
   qr_print_help: 'इसे प्रिंट कर मंडप पर लगाएं, या QR इमेज व्हाट्सएप पर भेजें।',
   qr_download: 'QR इमेज डाउनलोड',
   qr_link: 'आपका सार्वजनिक लिंक',
+  my_account: 'मेरा खाता',
+  role_owner: 'मुख्य एडमिन',
+  role_helper: 'सहायक',
+  role: 'भूमिका',
+  logins: 'लॉगिन',
+  role_owner_can: 'आप मुख्य एडमिन हैं — आप चंदा, सेटिंग और लॉगिन सहित सब कुछ बदल सकते हैं।',
+  role_helper_can: 'आप महोत्सव का रोज़ का काम संभाल सकते हैं। चंदा दर्ज करना, सेटिंग बदलना और लॉगिन बनाना मुख्य एडमिन के लिए रखा गया है।',
+  reset_password: 'पासवर्ड रीसेट',
+  owner_only: 'केवल मुख्य एडमिन',
+  read_only: 'केवल देखने के लिए',
 };
 
 const mr = {
@@ -730,6 +760,16 @@ const mr = {
   qr_print_help: 'हे प्रिंट करून मंडपात लावा, किंवा QR इमेज व्हॉट्सअॅपवर पाठवा.',
   qr_download: 'QR इमेज डाउनलोड',
   qr_link: 'तुमची सार्वजनिक लिंक',
+  my_account: 'माझे खाते',
+  role_owner: 'मुख्य अ‍ॅडमिन',
+  role_helper: 'सहाय्यक',
+  role: 'भूमिका',
+  logins: 'लॉगिन',
+  role_owner_can: 'तुम्ही मुख्य अ‍ॅडमिन आहात — तुम्ही वर्गणी, सेटिंग आणि लॉगिनसह सर्व काही बदलू शकता.',
+  role_helper_can: 'तुम्ही महोत्सवाचे रोजचे काम सांभाळू शकता. वर्गणी नोंदवणे, सेटिंग बदलणे आणि लॉगिन तयार करणे मुख्य अ‍ॅडमिनसाठी राखीव आहे.',
+  reset_password: 'पासवर्ड रीसेट',
+  owner_only: 'फक्त मुख्य अ‍ॅडमिन',
+  read_only: 'फक्त पाहण्यासाठी',
 };
 
 const DICT = { en, gu, hi, mr };

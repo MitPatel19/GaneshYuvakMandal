@@ -4,7 +4,9 @@
   <h1>🧾 <%= t('receipt') %></h1>
   <div class="pagehead__actions">
     <a class="btn btn--ghost" href="/donations">← <%= t('donations') %></a>
-    <a class="btn btn--ghost" href="/donations/<%= donation.id %>/edit"><%= t('edit') %></a>
+    <% if (isOwner) { %>
+      <a class="btn btn--ghost" href="/donations/<%= donation.id %>/edit"><%= t('edit') %></a>
+    <% } %>
   </div>
 </div>
 
@@ -74,9 +76,11 @@
     <% } %>
   </div>
 
-  <div class="btnrow">
-    <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
-  </div>
+  <% if (isOwner) { %>
+    <div class="btnrow">
+      <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+    </div>
+  <% } %>
 </div>
 
 <%- include('../partials/footer') %>

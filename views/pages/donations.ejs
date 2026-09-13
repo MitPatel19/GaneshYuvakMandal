@@ -7,9 +7,18 @@
   </div>
   <div class="pagehead__actions">
     <a class="btn btn--ghost" href="/donations/export.csv?<%= new URLSearchParams(filters).toString() %>">⬇ CSV</a>
-    <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+    <% if (isOwner) { %>
+      <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+    <% } %>
   </div>
 </div>
+
+<% if (!isOwner) { %>
+  <div class="alert alert--warn">
+    <span class="alert__ic">👁</span>
+    <span><%= t('read_only') %> — <%= t('owner_only') %> can add or change donations.</span>
+  </div>
+<% } %>
 
 <form class="searchbar" method="get" action="/donations" data-no-lock>
   <input type="search" name="q" value="<%= filters.q %>" placeholder="<%= t('search') %> — <%= t('donor_name') %>, <%= t('phone') %>, <%= t('receipt_no') %>">
@@ -47,7 +56,9 @@
           </div>
           <div class="list__actions">
             <a class="btn btn--saffron btn--sm" href="/donations/<%= d.id %>/receipt">🧾</a>
-            <a class="btn btn--ghost btn--sm" href="/donations/<%= d.id %>/edit"><%= t('edit') %></a>
+            <% if (isOwner) { %>
+              <a class="btn btn--ghost btn--sm" href="/donations/<%= d.id %>/edit"><%= t('edit') %></a>
+            <% } %>
           </div>
         </li>
       <% }); %>
@@ -60,7 +71,9 @@
     <div class="empty">
       <div class="empty__ic">💰</div>
       <p><%= t('none_yet') %></p>
-      <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+      <% if (isOwner) { %>
+        <a class="btn btn--primary" href="/donations/new">➕ <%= t('new_donation') %></a>
+      <% } %>
     </div>
   <% } %>
 </div>

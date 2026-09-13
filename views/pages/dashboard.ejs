@@ -49,9 +49,11 @@
 
 <h2><%= t('quick_actions') %></h2>
 <div class="quickgrid mb-3">
-  <a class="quick quick--hot" href="/donations/new">
-    <span class="quick__ic" aria-hidden="true">➕</span><span><%= t('new_donation') %></span>
-  </a>
+  <% if (isOwner) { %>
+    <a class="quick quick--hot" href="/donations/new">
+      <span class="quick__ic" aria-hidden="true">➕</span><span><%= t('new_donation') %></span>
+    </a>
+  <% } %>
   <a class="quick quick--wa" href="<%= inviteLink %>" target="_blank" rel="noopener" data-share="#inviteText">
     <span class="quick__ic" aria-hidden="true">💬</span><span><%= t('invite_text') %></span>
   </a>
@@ -195,7 +197,9 @@
       <div class="empty">
         <div class="empty__ic">💰</div>
         <p>No donation recorded yet.</p>
-        <a class="btn btn--primary btn--sm" href="/donations/new"><%= t('new_donation') %></a>
+        <% if (isOwner) { %>
+          <a class="btn btn--primary btn--sm" href="/donations/new"><%= t('new_donation') %></a>
+        <% } %>
       </div>
     <% } %>
   </div>

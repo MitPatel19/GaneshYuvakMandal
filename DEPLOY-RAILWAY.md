@@ -125,6 +125,10 @@ Your two important links:
 6. Go to **🔳 QR Code**, print the poster and paste it at the mandap so visitors
    can scan for the program.
 7. Go to **💬 WhatsApp**, choose the *Invitation* template and start sending.
+8. In **⚙️ Settings → Logins**, create a login for each committee member.
+   Choose **Helper** for volunteers: they can run everything day to day but
+   cannot record donations, change settings or create logins. Choose **Main
+   Admin** only for someone you want to have exactly your own access.
 
 > 💬 **Message language.** Templates are supplied in English, Gujarati, Hindi
 > and Marathi, and follow whichever language you pick with the 🌐 button. If you
@@ -194,6 +198,10 @@ The app didn't start. Check the **Deploy Logs**. Make sure you did *not* set a
 The Volume is missing or `DATA_DIR` doesn't match the mount path. Go back to
 Step 2 and Step 3 — the mount path and `DATA_DIR` must both be `/data`.
 Restore from your JSON backup afterwards.
+
+**A helper forgot their password**
+Log in as the main admin and open **Settings → Logins → 🔑 Reset password** on
+their row. They can also change it themselves any time under **My Account**.
 
 **I forgot the admin password**
 Change `ADMIN_PASSWORD` in Variables — but note this only creates the *first*

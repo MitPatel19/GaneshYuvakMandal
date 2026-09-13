@@ -3,6 +3,7 @@ const express = require('express');
 const QRCode = require('qrcode');
 const { db, getSetting, getBuiltinTemplate } = require('../lib/db');
 const h = require('../lib/helpers');
+const { requireOwner } = require('../lib/auth');
 
 const router = express.Router();
 
@@ -72,7 +73,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', requireOwner, (req, res) => {
   const s = res.locals.settings;
   res.render('pages/donation-form', {
     title: res.locals.t('new_donation'),
@@ -96,7 +97,7 @@ router.get('/new', (req, res) => {
   });
 });
 
-router.post('/new', (req, res) => {
+router.post('/new', requireOwner, (req, res) => {
   const b = req.body;
   const name = String(b.donor_name || '').trim();
   const amount = Number(b.amount);
@@ -129,7 +130,7 @@ router.post('/new', (req, res) => {
   res.redirect(`/donations/${info.lastInsertRowid}/receipt?ok=` + encodeURIComponent('Donation saved'));
 });
 
-router.get('/:id/edit', (req, res) => {
+router.get('/:id/edit', requireOwner, (req, res) => {
   const donation = db.prepare('SELECT * FROM donations WHERE id = ?').get(req.params.id);
   if (!donation) return res.redirect('/donations');
   res.render('pages/donation-form', {
@@ -143,7 +144,7 @@ router.get('/:id/edit', (req, res) => {
   });
 });
 
-router.post('/:id/edit', (req, res) => {
+router.post('/:id/edit', requireOwner, (req, res) => {
   const b = req.body;
   const amount = Number(b.amount);
   db.prepare(
@@ -166,7 +167,7 @@ router.post('/:id/edit', (req, res) => {
   res.redirect(`/donations/${req.params.id}/receipt?ok=` + encodeURIComponent('Donation updated'));
 });
 
-router.post('/:id/delete', (req, res) => {
+router.post('/:id/delete', requireOwner, (req, res) => {
   db.prepare('DELETE FROM donations WHERE id = ?').run(req.params.id);
   res.redirect('/donations?ok=' + encodeURIComponent('Donation deleted'));
 });

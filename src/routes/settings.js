@@ -2,7 +2,7 @@
 const express = require('express');
 const QRCode = require('qrcode');
 const { db, setSetting, allSettings } = require('../lib/db');
-const { setPassword, verifyUser } = require('../lib/auth');
+const { setPassword, verifyUser, ROLE_OWNER, ROLE_HELPER } = require('../lib/auth');
 const h = require('../lib/helpers');
 const { LANGUAGES } = require('../lib/i18n');
 
@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
   }
   const publicUrl = `${req.protocol}://${req.get('host')}/p`;
   const users = db
-    .prepare('SELECT id, username, display_name, created_at FROM users ORDER BY id')
+    .prepare('SELECT id, username, display_name, role, created_at FROM users ORDER BY id')
     .all();
   res.render('pages/settings', {
     title: res.locals.t('settings'),
@@ -81,6 +81,7 @@ router.post('/password', (req, res) => {
 
 /** Extra logins so the treasurer and secretary do not share one password. */
 router.post('/users/new', (req, res) => {
+  const role = req.body.role === ROLE_OWNER ? ROLE_OWNER : ROLE_HELPER;
   const username = String(req.body.username || '').trim().toLowerCase();
   const password = String(req.body.password || '');
   if (!/^[a-z0-9_.-]{3,32}$/.test(username)) {
@@ -98,9 +99,41 @@ router.post('/users/new', (req, res) => {
     username,
     bcrypt.hashSync(password, 10),
     String(req.body.display_name || '').trim(),
-    'admin'
+    role
   );
   res.redirect('/settings?ok=' + encodeURIComponent('Login created'));
+});
+
+/** Promote or demote a login. The last owner can never be demoted. */
+router.post('/users/:id/role', (req, res) => {
+  const id = Number(req.params.id);
+  const role = req.body.role === ROLE_OWNER ? ROLE_OWNER : ROLE_HELPER;
+  const owners = db.prepare("SELECT COUNT(*) AS c FROM users WHERE role = 'owner'").get().c;
+  const target = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+  if (!target) return res.redirect('/settings');
+  if (target.role === ROLE_OWNER && role === ROLE_HELPER && owners <= 1) {
+    return res.redirect(
+      '/settings?err=' +
+        encodeURIComponent('There must always be one main admin. Make someone else the main admin first.')
+    );
+  }
+  db.prepare('UPDATE users SET role = ? WHERE id = ?').run(role, id);
+  res.redirect('/settings?ok=' + encodeURIComponent('Role updated'));
+});
+
+/** Give a helper a new password when they forget theirs. */
+router.post('/users/:id/password', (req, res) => {
+  const id = Number(req.params.id);
+  const next = String(req.body.new_password || '');
+  if (next.length < 6) {
+    return res.redirect(
+      '/settings?err=' + encodeURIComponent('Password must be at least 6 characters.')
+    );
+  }
+  const target = db.prepare('SELECT id FROM users WHERE id = ?').get(id);
+  if (!target) return res.redirect('/settings');
+  setPassword(id, next);
+  res.redirect('/settings?ok=' + encodeURIComponent('Password reset'));
 });
 
 router.post('/users/:id/delete', (req, res) => {
@@ -111,6 +144,13 @@ router.post('/users/:id/delete', (req, res) => {
   }
   if (id === req.user.id) {
     return res.redirect('/settings?err=' + encodeURIComponent('You cannot delete the login you are using.'));
+  }
+  const target = db.prepare('SELECT role FROM users WHERE id = ?').get(id);
+  const owners = db.prepare("SELECT COUNT(*) AS c FROM users WHERE role = 'owner'").get().c;
+  if (target && target.role === 'owner' && owners <= 1) {
+    return res.redirect(
+      '/settings?err=' + encodeURIComponent('You cannot delete the only main admin.')
+    );
   }
   db.prepare('DELETE FROM users WHERE id = ?').run(id);
   res.redirect('/settings?ok=' + encodeURIComponent('Login removed'));

@@ -99,10 +99,23 @@ set a fixed address in Settings once you attach your own domain.
 Committee directory with WhatsApp and call buttons, a photo gallery that also
 feeds the public page, and pinned announcements that show on the home screen.
 
-### 🔐 Practical things
-Multiple logins (give the treasurer their own), password change, CSV exports,
-a full JSON backup, and a **Start a new season** button that clears the year's
-records while keeping members, photos, templates and settings.
+### 🔐 Two kinds of login
+- **Main Admin** — you. Everything: recording donations, all settings, and
+  creating logins for everyone else.
+- **Helper** — a login you create for a committee member. They run the
+  Mahotsav day to day (seva, members, expenses, program, duty, WhatsApp,
+  gallery, announcements, reports) but **cannot add or change donations,
+  cannot open Settings, and cannot create logins.** They still see the
+  donation figures and donor list, so the books stay transparent — the
+  entry work is simply kept with you.
+
+Every login manages its own password from **My Account**, and the main admin
+can reset a helper's password or promote them. The app will not let you remove
+or demote the last main admin, so nobody can lock themselves out.
+
+Also: CSV exports, a full JSON backup, and a **Start a new season** button that
+clears the year's records while keeping members, the seva list, photos,
+templates and settings.
 
 ---
 
@@ -184,7 +197,7 @@ src/
     config.js          Environment and paths
     db.js              SQLite connection, schema, first-run seeding
     schema.sql         Table definitions
-    auth.js            Login, password hashing, rate limiting
+    auth.js            Login, roles (owner / helper), password hashing, rate limiting
     helpers.js         Dates, money, phone/WhatsApp links, templates, CSV
     i18n.js            English / Gujarati / Hindi / Marathi dictionary
     templates.js       Built-in WhatsApp templates in all four languages
