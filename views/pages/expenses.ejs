@@ -7,9 +7,18 @@
   </div>
   <div class="pagehead__actions">
     <a class="btn btn--ghost" href="/expenses/export.csv?<%= new URLSearchParams(filters).toString() %>">⬇ CSV</a>
-    <a class="btn btn--primary" href="/expenses/new">➕ <%= t('new_expense') %></a>
+    <% if (isOwner) { %>
+      <a class="btn btn--primary" href="/expenses/new">➕ <%= t('new_expense') %></a>
+    <% } %>
   </div>
 </div>
+
+<% if (!isOwner) { %>
+  <div class="alert alert--warn">
+    <span class="alert__ic">👁</span>
+    <span><%= t('read_only') %> — <%= t('owner_only') %> can add or change expenses.</span>
+  </div>
+<% } %>
 
 <form class="searchbar" method="get" action="/expenses" data-no-lock>
   <input type="search" name="q" value="<%= filters.q %>" placeholder="<%= t('search') %> — <%= t('title') %>, <%= t('vendor') %>">
@@ -51,9 +60,11 @@
             </div>
           </div>
           <div class="list__side"><div class="money-out big"><%= h.formatMoney(e.amount, currency) %></div></div>
-          <div class="list__actions">
-            <a class="btn btn--ghost btn--sm" href="/expenses/<%= e.id %>/edit"><%= t('edit') %></a>
-          </div>
+          <% if (isOwner) { %>
+            <div class="list__actions">
+              <a class="btn btn--ghost btn--sm" href="/expenses/<%= e.id %>/edit"><%= t('edit') %></a>
+            </div>
+          <% } %>
         </li>
       <% }); %>
     </ul>
@@ -65,7 +76,9 @@
     <div class="empty">
       <div class="empty__ic">🧾</div>
       <p><%= t('none_yet') %></p>
-      <a class="btn btn--primary" href="/expenses/new">➕ <%= t('new_expense') %></a>
+      <% if (isOwner) { %>
+        <a class="btn btn--primary" href="/expenses/new">➕ <%= t('new_expense') %></a>
+      <% } %>
     </div>
   <% } %>
 </div>

@@ -2,6 +2,7 @@
 const express = require('express');
 const { db } = require('../lib/db');
 const h = require('../lib/helpers');
+const { requireOwner } = require('../lib/auth');
 
 const router = express.Router();
 
@@ -39,7 +40,7 @@ router.get('/', (req, res) => {
     .get(...params);
   const byCategory = db
     .prepare(
-      `SELECT category, COALESCE(SUM(amount),0) AS total FROM expenses
+      `SELECT category AS label, COALESCE(SUM(amount),0) AS total FROM expenses
         GROUP BY category ORDER BY total DESC`
     )
     .all();
@@ -55,7 +56,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', requireOwner, (req, res) => {
   res.render('pages/expense-form', {
     title: res.locals.t('new_expense'),
     expense: {
@@ -67,7 +68,7 @@ router.get('/new', (req, res) => {
   });
 });
 
-router.post('/new', (req, res) => {
+router.post('/new', requireOwner, (req, res) => {
   const b = req.body;
   const amount = Number(b.amount);
   if (!String(b.title || '').trim()) {
@@ -91,7 +92,7 @@ router.post('/new', (req, res) => {
   res.redirect('/expenses?ok=' + encodeURIComponent('Expense saved'));
 });
 
-router.get('/:id/edit', (req, res) => {
+router.get('/:id/edit', requireOwner, (req, res) => {
   const expense = db.prepare('SELECT * FROM expenses WHERE id = ?').get(req.params.id);
   if (!expense) return res.redirect('/expenses');
   res.render('pages/expense-form', {
@@ -102,7 +103,7 @@ router.get('/:id/edit', (req, res) => {
   });
 });
 
-router.post('/:id/edit', (req, res) => {
+router.post('/:id/edit', requireOwner, (req, res) => {
   const b = req.body;
   const amount = Number(b.amount);
   db.prepare(
@@ -121,7 +122,7 @@ router.post('/:id/edit', (req, res) => {
   res.redirect('/expenses?ok=' + encodeURIComponent('Expense updated'));
 });
 
-router.post('/:id/delete', (req, res) => {
+router.post('/:id/delete', requireOwner, (req, res) => {
   db.prepare('DELETE FROM expenses WHERE id = ?').run(req.params.id);
   res.redirect('/expenses?ok=' + encodeURIComponent('Expense deleted'));
 });

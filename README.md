@@ -103,11 +103,11 @@ feeds the public page, and pinned announcements that show on the home screen.
 - **Main Admin** — you. Everything: recording donations, all settings, and
   creating logins for everyone else.
 - **Helper** — a login you create for a committee member. They run the
-  Mahotsav day to day (seva, members, expenses, program, duty, WhatsApp,
-  gallery, announcements, reports) but **cannot add or change donations,
-  cannot open Settings, and cannot create logins.** They still see the
-  donation figures and donor list, so the books stay transparent — the
-  entry work is simply kept with you.
+  Mahotsav day to day (seva, members, program, duty roster, WhatsApp,
+  gallery, announcements, reports) but **cannot add or change donations or
+  expenses, cannot open Settings, and cannot create logins.** They still see
+  every donation and expense figure, so the books stay transparent to the
+  committee — only the money entry is kept with you.
 
 Every login manages its own password from **My Account**, and the main admin
 can reset a helper's password or promote them. The app will not let you remove

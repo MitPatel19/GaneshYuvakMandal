@@ -60,9 +60,11 @@
   <a class="quick quick--hot" href="/seva/new?date=<%= today %>">
     <span class="quick__ic" aria-hidden="true">🍛</span><span><%= t('seva_add') %></span>
   </a>
-  <a class="quick" href="/expenses/new">
-    <span class="quick__ic" aria-hidden="true">🧾</span><span><%= t('new_expense') %></span>
-  </a>
+  <% if (isOwner) { %>
+    <a class="quick" href="/expenses/new">
+      <span class="quick__ic" aria-hidden="true">🧾</span><span><%= t('new_expense') %></span>
+    </a>
+  <% } %>
   <a class="quick" href="/schedule">
     <span class="quick__ic" aria-hidden="true">📅</span><span><%= t('schedule') %></span>
   </a>

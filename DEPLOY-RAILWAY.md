@@ -127,7 +127,8 @@ Your two important links:
 7. Go to **💬 WhatsApp**, choose the *Invitation* template and start sending.
 8. In **⚙️ Settings → Logins**, create a login for each committee member.
    Choose **Helper** for volunteers: they can run everything day to day but
-   cannot record donations, change settings or create logins. Choose **Main
+   cannot record donations or expenses, change settings, or create logins.
+   They can still see all the figures. Choose **Main
    Admin** only for someone you want to have exactly your own access.
 
 > 💬 **Message language.** Templates are supplied in English, Gujarati, Hindi
